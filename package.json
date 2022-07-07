@@ -1,5 +1,5 @@
 {
-    "name": "email-text-tools",
+    "name": "@postalsys/email-text-tools",
     "version": "1.0.0",
     "description": "Email text tools",
     "main": "index.js",
