@@ -1,0 +1,34 @@
+{
+    "name": "email-text-tools",
+    "version": "1.0.0",
+    "description": "Email text tools",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/postalsys/email-text-tools.git"
+    },
+    "keywords": [],
+    "author": "Postal Systems OÜ",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/postalsys/email-text-tools/issues"
+    },
+    "homepage": "https://github.com/postalsys/email-text-tools#readme",
+    "devDependencies": {
+        "eslint-config-nodemailer": "1.2.0",
+        "eslint-config-prettier": "8.5.0"
+    },
+    "dependencies": {
+        "handlebars": "4.7.7",
+        "he": "1.2.0",
+        "html-to-text": "8.2.0",
+        "js-beautify": "1.14.4",
+        "linkify-it": "4.0.1",
+        "moment-timezone": "0.5.34",
+        "node-html-parser": "5.3.3",
+        "tlds": "1.231.0"
+    }
+}
