@@ -24,11 +24,11 @@
     "dependencies": {
         "handlebars": "4.7.7",
         "he": "1.2.0",
-        "html-to-text": "8.2.0",
-        "js-beautify": "1.14.4",
+        "html-to-text": "8.2.1",
+        "js-beautify": "1.14.7",
         "linkify-it": "4.0.1",
-        "moment-timezone": "0.5.34",
-        "node-html-parser": "5.3.3",
-        "tlds": "1.231.0"
+        "moment-timezone": "0.5.39",
+        "node-html-parser": "6.1.4",
+        "tlds": "1.233.0"
     }
 }
