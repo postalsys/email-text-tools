@@ -5,6 +5,6 @@ const htmlToText = require('./lib/html-to-text');
 const inlineHtml = require('./lib/inline-html');
 const inlineText = require('./lib/inline-text');
 const mimeHtml = require('./lib/mime-html');
-const extractReply = require('./lib/extract-reply');
+const generateSummary = require('./lib/generate-summary');
 
-module.exports = { textToHtml, htmlToText, inlineHtml, inlineText, mimeHtml, extractReply };
+module.exports = { textToHtml, htmlToText, inlineHtml, inlineText, mimeHtml, generateSummary };

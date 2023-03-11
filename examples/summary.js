@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs').promises;
-const extractReply = require('../lib/extract-reply');
+const generateSummary = require('../lib/generate-summary');
 const simpleParser = require('mailparser').simpleParser;
 
 async function main() {
@@ -9,7 +9,7 @@ async function main() {
 
     const parsed = await simpleParser(eml);
 
-    const replyText = await extractReply(
+    const summary = await generateSummary(
         {
             html: parsed.html,
             text: parsed.text
@@ -17,7 +17,7 @@ async function main() {
         process.env.OPENAI_API_KEY
     );
 
-    console.log(replyText);
+    console.log(summary);
 }
 
 main();
