@@ -11,6 +11,8 @@ async function main() {
 
     const summary = await generateSummary(
         {
+            from: parsed.from.value,
+            subject: parsed.subject,
             html: parsed.html,
             text: parsed.text
         },
