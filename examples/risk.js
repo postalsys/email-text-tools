@@ -21,7 +21,12 @@ async function analyzeEmail(path) {
             html: parsed.html,
             text: parsed.text
         },
-        process.env.OPENAI_API_KEY
+        process.env.OPENAI_API_KEY,
+        {
+            //gptModel: 'gpt-3.5-turbo'
+            gptModel: 'gpt-4',
+            maxTokens: 6000
+        }
     );
 
     result.file = Path.basename(path);
