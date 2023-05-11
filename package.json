@@ -1,6 +1,6 @@
 {
     "name": "@postalsys/email-text-tools",
-    "version": "1.4.1",
+    "version": "2.0.0",
     "description": "Email text tools",
     "main": "index.js",
     "scripts": {
@@ -19,13 +19,10 @@
     "homepage": "https://github.com/postalsys/email-text-tools#readme",
     "devDependencies": {
         "eslint-config-nodemailer": "1.2.0",
-        "eslint-config-prettier": "8.8.0",
-        "mailparser": "3.6.4"
+        "eslint-config-prettier": "8.8.0"
     },
     "dependencies": {
         "dompurify": "3.0.2",
-        "gpt3-tokenizer": "1.1.5",
-        "handlebars": "4.7.7",
         "he": "1.2.0",
         "html-to-text": "9.0.5",
         "js-beautify": "1.14.7",
@@ -34,7 +31,6 @@
         "linkify-it": "4.0.1",
         "moment-timezone": "0.5.43",
         "node-html-parser": "6.1.5",
-        "tlds": "1.238.0",
-        "undici": "5.22.0"
+        "tlds": "1.238.0"
     }
 }
