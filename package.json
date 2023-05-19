@@ -1,6 +1,6 @@
 {
     "name": "@postalsys/email-text-tools",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "Email text tools",
     "main": "index.js",
     "scripts": {
@@ -22,11 +22,11 @@
         "eslint-config-prettier": "8.8.0"
     },
     "dependencies": {
-        "dompurify": "3.0.2",
+        "dompurify": "3.0.3",
         "he": "1.2.0",
         "html-to-text": "9.0.5",
         "js-beautify": "1.14.7",
-        "jsdom": "21.1.1",
+        "jsdom": "22.0.0",
         "juice": "9.0.0",
         "linkify-it": "4.0.1",
         "moment-timezone": "0.5.43",
