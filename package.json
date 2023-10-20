@@ -4,7 +4,8 @@
     "description": "Email text tools",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "update": "rm -rf node_modules package-lock.json && ncu -u && npm install"
     },
     "repository": {
         "type": "git",
@@ -22,7 +23,7 @@
         "eslint-config-prettier": "9.0.0"
     },
     "dependencies": {
-        "dompurify": "3.0.5",
+        "dompurify": "3.0.6",
         "he": "1.2.0",
         "html-to-text": "9.0.5",
         "js-beautify": "1.14.9",
@@ -30,7 +31,7 @@
         "juice": "9.1.0",
         "linkify-it": "4.0.1",
         "moment-timezone": "0.5.43",
-        "node-html-parser": "6.1.6",
-        "tlds": "1.242.0"
+        "node-html-parser": "6.1.10",
+        "tlds": "1.243.0"
     }
 }
