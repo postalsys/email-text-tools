@@ -20,18 +20,18 @@
     "homepage": "https://github.com/postalsys/email-text-tools#readme",
     "devDependencies": {
         "eslint-config-nodemailer": "1.2.0",
-        "eslint-config-prettier": "9.0.0"
+        "eslint-config-prettier": "9.1.0"
     },
     "dependencies": {
-        "dompurify": "3.0.6",
+        "dompurify": "3.0.8",
         "he": "1.2.0",
         "html-to-text": "9.0.5",
-        "js-beautify": "1.14.11",
-        "jsdom": "23.0.0",
-        "juice": "9.1.0",
-        "linkify-it": "4.0.1",
-        "moment-timezone": "0.5.43",
-        "node-html-parser": "6.1.11",
-        "tlds": "1.247.0"
+        "js-beautify": "1.15.1",
+        "jsdom": "24.0.0",
+        "juice": "10.0.0",
+        "linkify-it": "5.0.0",
+        "moment-timezone": "0.5.45",
+        "node-html-parser": "6.1.12",
+        "tlds": "1.250.0"
     }
 }
