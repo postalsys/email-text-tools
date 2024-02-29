@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.6](https://github.com/postalsys/email-text-tools/compare/v2.1.5...v2.1.6) (2024-02-18)
+
+
+### Bug Fixes
+
+* **deps:** removed js-beautify ([a73ccc9](https://github.com/postalsys/email-text-tools/commit/a73ccc97a4acf9bfa7e439939c41869c2554b073))
+
 ## [2.1.5](https://github.com/postalsys/email-text-tools/compare/v2.1.4...v2.1.5) (2024-02-18)
 
 
