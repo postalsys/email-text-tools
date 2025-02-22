@@ -23,13 +23,13 @@
         "eslint-config-prettier": "9.1.0"
     },
     "dependencies": {
-        "dompurify": "3.2.3",
+        "dompurify": "3.2.4",
         "he": "1.2.0",
         "html-to-text": "9.0.5",
         "jsdom": "26.0.0",
         "juice": "11.0.0",
         "linkify-it": "5.0.0",
-        "moment-timezone": "0.5.46",
+        "moment-timezone": "0.5.47",
         "node-html-parser": "7.0.1",
         "tlds": "1.255.0"
     }
