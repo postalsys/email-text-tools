@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.15](https://github.com/postalsys/email-text-tools/compare/v2.1.14...v2.1.15) (2025-05-20)
+
+
+### Bug Fixes
+
+* Bumped deps ([519eb91](https://github.com/postalsys/email-text-tools/commit/519eb913a2aa91afe2eb1c782186f4f043ce1c55))
+
 ## [2.1.14](https://github.com/postalsys/email-text-tools/compare/v2.1.13...v2.1.14) (2025-02-22)
 
 
