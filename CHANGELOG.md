@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.16](https://github.com/postalsys/email-text-tools/compare/v2.1.15...v2.1.16) (2025-06-29)
+
+
+### Bug Fixes
+
+* removed unneeded console log lines ([3a10214](https://github.com/postalsys/email-text-tools/commit/3a1021483029a1c99df122241c4e0f6062b91059))
+
 ## [2.1.15](https://github.com/postalsys/email-text-tools/compare/v2.1.14...v2.1.15) (2025-05-20)
 
 
