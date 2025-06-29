@@ -29,7 +29,7 @@
         "jsdom": "26.1.0",
         "juice": "11.0.1",
         "linkify-it": "5.0.0",
-        "moment-timezone": "0.5.48",
+        "moment-timezone": "0.6.0",
         "node-html-parser": "7.0.1",
         "tlds": "1.259.0"
     }
