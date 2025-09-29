@@ -27,7 +27,7 @@
         "he": "1.2.0",
         "html-to-text": "9.0.5",
         "jsdom": "26.1.0",
-        "juice": "11.0.1",
+        "juice": "^11.0.2",
         "linkify-it": "5.0.0",
         "moment-timezone": "0.6.0",
         "node-html-parser": "7.0.1",

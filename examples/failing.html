@@ -1,17 +1,9 @@
-'use strict';
-
-const mimeHtml = require('../lib/mime-html');
-const fs = require('fs');
-
-const type = process.argv[3] || 'html';
-const file = fs.readFileSync(process.argv[2]);
-
-const HTML_TEMPLATE = `<!doctype html><html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" style="background-color: #fff;"><head>
+<!doctype html><html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" style="background-color: #fff;"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Neue Nachricht!</title>
     <!--[if !mso]><!-->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!--<![endif]-->
-
+    
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
       #outlook a { padding:0; }
@@ -35,7 +27,7 @@ const HTML_TEMPLATE = `<!doctype html><html lang="und" dir="auto" xmlns="http://
       .mj-outlook-group-fix { width:100% !important; }
     </style>
     <![endif]-->
-
+    
       <!--[if !mso]><!-->
         <link href="https://fonts.googleapis.com/css?family=Inter:400,600" rel="stylesheet" type="text/css">
         <style type="text/css">
@@ -43,8 +35,8 @@ const HTML_TEMPLATE = `<!doctype html><html lang="und" dir="auto" xmlns="http://
         </style>
       <!--<![endif]-->
 
-
-
+    
+    
     <style type="text/css">
       @media only screen and (min-width:480px) {
         .mj-column-per-100 { width:100% !important; max-width: 100%; }
@@ -53,24 +45,24 @@ const HTML_TEMPLATE = `<!doctype html><html lang="und" dir="auto" xmlns="http://
     <style media="screen and (min-width:480px)">
       .moz-text-html .mj-column-per-100 { width:100% !important; max-width: 100%; }
     </style>
-
-
-
-
+    
+    
+  
+    
     <style type="text/css">
 
     @media only screen and (max-width:479px) {
       table.mj-full-width-mobile { width: 100% !important; }
       td.mj-full-width-mobile { width: auto !important; }
     }
-
+  
     </style>
-
+     
     <style type="text/css">
 .wfix {
           max-width: 600px !important;
         }
-
+        
         @media(max-width: 480px) {
           .body-image-mobile-width-14 td { width: 14px !important; }
           .body-image td  { max-width: 100% !important; }
@@ -79,7 +71,7 @@ const HTML_TEMPLATE = `<!doctype html><html lang="und" dir="auto" xmlns="http://
             display: inline-block !important;
           }
         }
-
+        
     .mobile-only { display: none !important; } .desktop-only { display: block !important; }
     @media(max-width: 480px) { .column-stack { width: 100% !important; max-width: 100% !important; display: block !important; } .column-stack td,.column-stack th { padding-left: 0 !important; padding-right: 0 !important; } .mobile-only { display: block !important; } .desktop-only { display: none !important; } }
     </style>
@@ -92,10 +84,10 @@ const HTML_TEMPLATE = `<!doctype html><html lang="und" dir="auto" xmlns="http://
           .ShadowHTML .wrapper {
             padding: 0 !important;
           }
-
-
-
-
+         
+         
+         
+         
   .ShadowHTML :is(.styleUnquotedContent .unquoted-content, .styleUnquotedContent .sh-unquoted-content, .styleQuotedContent .sh-quoted-content, .sh-signature, .Signature-settings) :is(td.column-container, div[class^="mj-column-per-"]){font-size:0!important}
   html.sh-color :is(td.column-container, div[class^="mj-column-per-"], div.mj-column-per-100.mj-outlook-group-fix){font-size:0!important}
   @media(max-width:480px){
@@ -106,11 +98,11 @@ const HTML_TEMPLATE = `<!doctype html><html lang="und" dir="auto" xmlns="http://
   }
   html.sh-color a[href^="tel:"]{color:inherit!important;text-decoration:none!important;font-size:inherit!important;line-height:inherit!important;letter-spacing:inherit!important;vertical-align:baseline!important}
 
-
+         
       .isMarketing { background-color: #fff !important; }
       .isMarketing .styled-primary-column { background-color: #fff !important; border-radius: 0px; }
-
-
+    
+         
          [class~="x_social-icon-dark-mode"] { display: none !important; mso-hide:all;  width: 0px !important; padding: 0px !important; }
 
           /* Gmail selectors */
@@ -120,165 +112,164 @@ const HTML_TEMPLATE = `<!doctype html><html lang="und" dir="auto" xmlns="http://
           div > u + .body .wrapper {
             padding: 0 !important;
           }
-
+          
     a { text-decoration: none; color: #333; }
-
-
-
-
+    
+  
+          
+          
           .link-unsubscribe { color: #9ca3af !important; }
           </style>
 <meta name="color-scheme" content="light">
           <meta name="supported-color-schemes" content="light">
   </head>
   <body class="body" style="word-spacing:normal;background-color:#ffffff;">
-
-
+    
+    
       <div class="email-body" style="background-color:#ffffff;" lang="und" dir="auto">
         <!--[if mso]><style type="text/css"> a { text-decoration: underline !important; } .button a { text-decoration: none !important; } .outlook-list-fix { margin-left:4px !important; } .outlook-break-full-link { word-break: break-all !important; } .outlook-hide-social-icon { display: none !important; mso-hide:all; width: 0px !important; padding: 0px !important; } .outlook-hide-social-icon * { display: none !important; mso-hide:all; width: 0px !important; padding: 0px !important; } .outlook-hide-social-icon table { display: none !important; mso-hide:all; width: 0px !important; padding: 0px !important; } .outlook-hide-social-icon tbody { display: none !important; mso-hide:all; width: 0px !important; padding: 0px !important; } .outlook-hide-social-icon tr { display: none !important; mso-hide:all; width: 0px !important; padding: 0px !important; } .outlook-hide-social-icon td { display: none !important; mso-hide:all; width: 0px !important; padding: 0px !important; } .outlook-hide-social-icon img { display: none !important; mso-hide:all; width: 0px !important; padding: 0px !important; } .outlook-hide-social-icon a { display: none !important; mso-hide:all; width: 0px !important; padding: 0px !important; }
 </style><table align="center" border="0" cellpadding="0" cellspacing="0" class="wfix-outlook gmail-no-padding-outlook wrapper-outlook" role="presentation" style="width:600px;" width="600" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
-
-
+    
+      
       <div class="wfix gmail-no-padding wrapper" style="margin:0px auto;max-width:600px;">
-
+        
         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
           <tbody>
             <tr>
               <td style="direction:ltr;font-size:0px;padding:20px 0;padding-top:0;text-align:center;">
                 <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="wfix-outlook" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="wfix-outlook" role="presentation" style="width:600px;" width="600" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
-
-
+    
+      
       <div class="wfix" style="margin:0px auto;max-width:600px;">
-
+        
         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
           <tbody>
             <tr>
               <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:30px;padding-left:0px;padding-right:0px;padding-top:30px;text-align:center;">
                 <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="wfix-outlook rounded-corners-outlook styled-primary-column-outlook" style="vertical-align:top;width:600px;" ><![endif]-->
-
+            
       <div class="mj-column-per-100 mj-outlook-group-fix wfix rounded-corners styled-primary-column" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
-
+        
       <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse: separate;">
         <tbody>
           <tr>
             <td style="background-color:#ffffff;border-radius:0px;vertical-align:top;padding-top:0px;padding-right:15px;padding-bottom:0px;padding-left:15px;">
-
+              
       <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
         <tbody>
-
+          
               <tr>
                 <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word;">
-
+                  
       <div style="font-family:Inter, ui-sans-serif, sans-serif;font-size:14px;letter-spacing:0px;line-height:21px !important;text-align:left;color:#666666;"><span>&nbsp;</span></div>
-
+    
                 </td>
               </tr>
-
+            
               <tr>
                 <td align="left" class="body-image body-image-mobile-width-14" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word;">
-
+                  
       <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
         <tbody>
           <tr>
             <td style="width:14px;">
-
+              
         <a href="https://framer.com" target="_blank" style="text-decoration: none; color: #333;">
-
+          
       <img alt="Framer Logo" src="https://d3b9kr64nievew.cloudfront.net/cm915sac71jhgzjjtr8rmq42q/cmb54yn83cy1vzx0ib1pj5jrq.png" style="border:0;border-radius:0px;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="14" height="auto">
-
+    
         </a>
-
+      
             </td>
           </tr>
         </tbody>
       </table>
-
+    
                 </td>
               </tr>
-
+            
               <tr>
                 <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word;">
-
+                  
       <div style="font-family:Inter, ui-sans-serif, sans-serif;font-size:14px;letter-spacing:0px;line-height:21px !important;text-align:left;color:#666666;"><span>&nbsp;</span></div>
-
+    
                 </td>
               </tr>
-
+            
               <tr>
                 <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word;">
-
+                  
       <div style="font-family:Inter, ui-sans-serif, sans-serif;font-size:14px;letter-spacing:0px;line-height:21px !important;text-align:left;color:#666666;"><span style="line-height: 21px !important; font-size: 14px; font-size: 14px !important; white-space: pre-wrap;">Sie haben eine neue Nachricht über das Kontaktformular auf der Webseite erhalten!</span></div>
-
+    
                 </td>
               </tr>
-
+            
               <tr>
                 <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word;">
-
+                  
       <div style="font-family:Inter, ui-sans-serif, sans-serif;font-size:14px;letter-spacing:0px;line-height:22px !important;text-align:left;color:#666666;"><span>&nbsp;</span></div>
-
+    
                 </td>
               </tr>
-
+            
               <tr>
                 <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word;">
-
+                  
       <div style="font-family:Inter, ui-sans-serif, sans-serif;font-size:14px;letter-spacing:0px;line-height:21px !important;text-align:left;color:#666666;"><span style="line-height: 21px !important; font-size: 14px; font-size: 14px !important; white-space: pre-wrap;"><style type="text/css">a:link {text-decoration: none !important; }</style><div style="line-height:19px;padding-bottom:5px"><span style="color:#999999">Location: </span>Haus kaufen</div><div style="line-height:19px;padding-bottom:5px"><span style="color:#999999">Name: </span>Hayati Kaya</div><div style="line-height:19px;padding-bottom:5px"><span style="color:#999999">Phone Number: </span>+41796336385</div><div style="line-height:19px;padding-bottom:5px"><span style="color:#999999">Email Address: </span>kayahayati@windowslive.com</div><div style="line-height:19px;padding-bottom:5px"><span style="color:#999999">Message: </span>Ich bin an diesem Objekt in Remetchwil interessiert, für das Frau Rudhani zuständig ist, und würde es gerne besichtigen.</div></span></div>
-
+    
                 </td>
               </tr>
-
+            
               <tr>
                 <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word;">
-
+                  
       <div style="font-family:Inter, ui-sans-serif, sans-serif;font-size:14px;letter-spacing:0px;line-height:21px !important;text-align:left;color:#666666;"><span>&nbsp;</span></div>
-
+    
                 </td>
               </tr>
-
+            
               <tr>
                 <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word;">
-
+                  
       <div style="font-family:Inter, ui-sans-serif, sans-serif;font-size:14px;letter-spacing:0px;line-height:21px !important;text-align:left;color:#666666;"><span>&nbsp;</span></div>
-
+    
                 </td>
               </tr>
-
+            
         </tbody>
       </table>
-
+    
             </td>
           </tr>
         </tbody>
       </table>
-
+    
       </div>
-
+    
           <!--[if mso | IE]></td></tr></table><![endif]-->
               </td>
             </tr>
           </tbody>
         </table>
-
+        
       </div>
-
-
+    
+      
       <!--[if mso | IE]></td></tr></table></td></tr></table><![endif]-->
               </td>
             </tr>
           </tbody>
         </table>
-
+        
       </div>
-
-
+    
+      
       <!--[if mso | IE]></td></tr></table><![endif]-->
-
-
+    
+    
       </div>
-
+    
   </body>
 </html>
-`;
+  
 
-console.log(HTML_TEMPLATE.replace(/HTML_BODY/g, mimeHtml({ [type]: file })));
