@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.2.0](https://github.com/postalsys/email-text-tools/compare/v2.1.16...v2.2.0) (2025-09-29)
+
+
+### Features
+
+* **mime-html:** add timeout protection for CSS processing with juice ([9bd3542](https://github.com/postalsys/email-text-tools/commit/9bd35426642c00c20fa1a8ce9c898f7ab7fc7e43))
+
+
+### Bug Fixes
+
+* **mime-html:** ensure async version pre-filters problematic CSS selectors ([5166f71](https://github.com/postalsys/email-text-tools/commit/5166f714b8532c62aa33c76b2b4e2ac3c8642ca6))
+* **worker-pool:** properly return workers to free list after task completion ([2d6cd2c](https://github.com/postalsys/email-text-tools/commit/2d6cd2c451941932d44d2ce025a5ba867ec66fec))
+
 ## [2.1.16](https://github.com/postalsys/email-text-tools/compare/v2.1.15...v2.1.16) (2025-06-29)
 
 ### Bug Fixes
