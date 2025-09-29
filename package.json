@@ -5,8 +5,12 @@
     "main": "index.js",
     "scripts": {
         "test": "node --test test/*.test.js",
-    "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
-    "test:watch": "node --test --watch test/*.test.js",
+        "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
+        "test:watch": "node --test --watch test/*.test.js",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
         "update": "rm -rf node_modules package-lock.json && ncu -u && npm install"
     },
     "repository": {
@@ -21,8 +25,11 @@
     },
     "homepage": "https://github.com/postalsys/email-text-tools#readme",
     "devDependencies": {
+        "@eslint/js": "^9.36.0",
+        "eslint": "^9.36.0",
         "eslint-config-nodemailer": "1.2.0",
-        "eslint-config-prettier": "9.1.0"
+        "eslint-config-prettier": "9.1.0",
+        "prettier": "^3.6.2"
     },
     "dependencies": {
         "dompurify": "3.2.7",

@@ -25,7 +25,7 @@ const testCases = {
             </html>
         `
     },
-    
+
     moderate: {
         name: 'Moderate HTML with inline styles',
         html: `
@@ -55,7 +55,7 @@ const testCases = {
             </html>
         `
     },
-    
+
     complex: {
         name: 'Complex HTML with media queries',
         html: `
@@ -117,7 +117,7 @@ const testCases = {
             </html>
         `
     },
-    
+
     problematic: {
         name: 'HTML with problematic CSS (modern selectors)',
         html: `
@@ -159,7 +159,7 @@ try {
         name: 'Real-world problematic HTML',
         html: failingHtml
     };
-} catch (err) {
+} catch (_err) {
     // File doesn't exist, skip it
 }
 
@@ -168,20 +168,20 @@ class Benchmark {
     constructor() {
         this.results = [];
     }
-    
+
     async runTest(name, fn, iterations = 100) {
         const times = [];
         const errors = [];
-        
+
         // Warmup
         for (let i = 0; i < 5; i++) {
             try {
                 await fn();
-            } catch (err) {
+            } catch (_err) {
                 // Ignore warmup errors
             }
         }
-        
+
         // Actual test
         for (let i = 0; i < iterations; i++) {
             const start = process.hrtime.bigint();
@@ -193,7 +193,7 @@ class Benchmark {
                 errors.push(err.message);
             }
         }
-        
+
         if (times.length > 0) {
             times.sort((a, b) => a - b);
             const avg = times.reduce((a, b) => a + b, 0) / times.length;
@@ -202,7 +202,7 @@ class Benchmark {
             const max = times[times.length - 1];
             const p95 = times[Math.floor(times.length * 0.95)];
             const p99 = times[Math.floor(times.length * 0.99)];
-            
+
             return {
                 name,
                 iterations,
@@ -226,12 +226,12 @@ class Benchmark {
             };
         }
     }
-    
+
     formatResults(results) {
         console.log('\n' + '='.repeat(80));
         console.log(`Test Case: ${results.testCase}`);
         console.log('='.repeat(80));
-        
+
         const table = [];
         results.tests.forEach(test => {
             if (test.successful > 0) {
@@ -253,59 +253,83 @@ class Benchmark {
                 });
             }
         });
-        
+
         console.table(table);
-        
+
         // Calculate speedup if both succeeded
         const syncTest = results.tests.find(t => t.name === 'Sync');
         const asyncTest = results.tests.find(t => t.name === 'Async (with pool)');
-        
+
         if (syncTest && asyncTest && syncTest.successful > 0 && asyncTest.successful > 0) {
             const speedup = (parseFloat(syncTest.avg) / parseFloat(asyncTest.avg)).toFixed(2);
             if (speedup > 1) {
                 console.log(`\nAsync is ${speedup}x faster than Sync`);
             } else {
-                console.log(`\nSync is ${(1/speedup).toFixed(2)}x faster than Async`);
+                console.log(`\nSync is ${(1 / speedup).toFixed(2)}x faster than Async`);
             }
         }
     }
-    
+
     async runBenchmarks() {
         console.log('Starting Mime HTML Benchmarks...');
         console.log('================================\n');
-        
-        for (const [key, testCase] of Object.entries(testCases)) {
+
+        for (const [_key, testCase] of Object.entries(testCases)) {
             const results = {
                 testCase: testCase.name,
                 tests: []
             };
-            
+
             // Test sync version
-            results.tests.push(await this.runTest('Sync', () => {
-                return Promise.resolve(mimeHtml.sync({ html: testCase.html }));
-            }, 100));
-            
+            results.tests.push(
+                await this.runTest(
+                    'Sync',
+                    () => {
+                        return Promise.resolve(mimeHtml.sync({ html: testCase.html }));
+                    },
+                    100
+                )
+            );
+
             // Test async version with pool
-            results.tests.push(await this.runTest('Async (with pool)', async () => {
-                return await mimeHtml.async({ html: testCase.html }, {
-                    useWorkerPool: true,
-                    timeout: 5000,
-                    minWorkers: 2,
-                    maxWorkers: 4
-                });
-            }, 100));
-            
+            results.tests.push(
+                await this.runTest(
+                    'Async (with pool)',
+                    async () => {
+                        return await mimeHtml.async(
+                            { html: testCase.html },
+                            {
+                                useWorkerPool: true,
+                                timeout: 5000,
+                                minWorkers: 2,
+                                maxWorkers: 4
+                            }
+                        );
+                    },
+                    100
+                )
+            );
+
             // Test async version without pool
-            results.tests.push(await this.runTest('Async (no pool)', async () => {
-                return await mimeHtml.async({ html: testCase.html }, {
-                    useWorkerPool: false,
-                    timeout: 5000
-                });
-            }, 100));
-            
+            results.tests.push(
+                await this.runTest(
+                    'Async (no pool)',
+                    async () => {
+                        return await mimeHtml.async(
+                            { html: testCase.html },
+                            {
+                                useWorkerPool: false,
+                                timeout: 5000
+                            }
+                        );
+                    },
+                    100
+                )
+            );
+
             this.formatResults(results);
         }
-        
+
         // Show worker pool stats
         const stats = mimeHtml.getWorkerPoolStats();
         if (stats) {
@@ -314,7 +338,7 @@ class Benchmark {
             console.log('='.repeat(80));
             console.table([stats]);
         }
-        
+
         // Clean up
         await mimeHtml.closeWorkerPool();
     }
@@ -322,10 +346,13 @@ class Benchmark {
 
 // Run benchmarks
 const benchmark = new Benchmark();
-benchmark.runBenchmarks().then(() => {
-    console.log('\nBenchmark complete!');
-    process.exit(0);
-}).catch(err => {
-    console.error('Benchmark failed:', err);
-    process.exit(1);
-});
+benchmark
+    .runBenchmarks()
+    .then(() => {
+        console.log('\nBenchmark complete!');
+        process.exit(0);
+    })
+    .catch(err => {
+        console.error('Benchmark failed:', err);
+        process.exit(1);
+    });
