@@ -4,7 +4,9 @@
     "description": "Email text tools",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "node --test test/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
+    "test:watch": "node --test --watch test/*.test.js",
         "update": "rm -rf node_modules package-lock.json && ncu -u && npm install"
     },
     "repository": {
