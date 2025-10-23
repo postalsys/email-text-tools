@@ -29,9 +29,8 @@ module.exports = [
             }
         },
         rules: {
-            indent: 0,
-            'no-await-in-loop': 0,
-            'require-atomic-updates': 0,
+            'no-await-in-loop': 'off',
+            'require-atomic-updates': 'off',
             'no-unused-vars': [
                 'error',
                 {
