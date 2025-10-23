@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.1](https://github.com/postalsys/email-text-tools/compare/email-text-tools-v2.3.0...email-text-tools-v2.3.1) (2025-10-23)
+
+
+### Bug Fixes
+
+* trigger release to test npm publishing configuration ([88e7110](https://github.com/postalsys/email-text-tools/commit/88e711007a73a88e0f40b5bfb278826821c1fc6a))
+
 ## [2.3.0](https://github.com/postalsys/email-text-tools/compare/email-text-tools-v2.2.0...email-text-tools-v2.3.0) (2025-10-23)
 
 
