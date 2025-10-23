@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.3](https://github.com/postalsys/email-text-tools/compare/email-text-tools-v2.3.2...email-text-tools-v2.3.3) (2025-10-23)
+
+
+### Bug Fixes
+
+* remove registry-url to enable OIDC authentication for trusted publishing ([319e61e](https://github.com/postalsys/email-text-tools/commit/319e61ed7c83af3db4f0a58f4b5b85c296f6f6a6))
+* upgrade Node.js to version 24 for OIDC trusted publishing support ([fd41ca2](https://github.com/postalsys/email-text-tools/commit/fd41ca22a959c06eb2df4e8b957a0da86f42d9da))
+
 ## [2.3.2](https://github.com/postalsys/email-text-tools/compare/email-text-tools-v2.3.1...email-text-tools-v2.3.2) (2025-10-23)
 
 
