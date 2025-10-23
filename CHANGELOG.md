@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.4](https://github.com/postalsys/email-text-tools/compare/email-text-tools-v2.3.3...email-text-tools-v2.3.4) (2025-10-23)
+
+
+### Bug Fixes
+
+* Downgraded jsdom to 27.0.0 ([a2969e9](https://github.com/postalsys/email-text-tools/commit/a2969e9399ed6c9d15a85d7d8c11342bc5bf00ce))
+
 ## [2.3.3](https://github.com/postalsys/email-text-tools/compare/email-text-tools-v2.3.2...email-text-tools-v2.3.3) (2025-10-23)
 
 
