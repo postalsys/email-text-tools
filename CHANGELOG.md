@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.5](https://github.com/postalsys/email-text-tools/compare/email-text-tools-v2.3.4...email-text-tools-v2.3.5) (2025-10-29)
+
+
+### Bug Fixes
+
+* **htmlToText:** Improve HTML-to-text conversion for better newline preservation ([6606d5c](https://github.com/postalsys/email-text-tools/commit/6606d5c5b9d3b05f41d54c434f2b68760141dacb))
+
 ## [2.3.4](https://github.com/postalsys/email-text-tools/compare/email-text-tools-v2.3.3...email-text-tools-v2.3.4) (2025-10-23)
 
 
