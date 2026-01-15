@@ -1,5 +1,43 @@
 # Changelog
 
+## [2.4.0](https://github.com/postalsys/email-text-tools/compare/v2.3.5...v2.4.0) (2025-12-11)
+
+
+### Features
+
+* **mime-html:** add timeout protection for CSS processing with juice ([9bd3542](https://github.com/postalsys/email-text-tools/commit/9bd35426642c00c20fa1a8ce9c898f7ab7fc7e43))
+
+
+### Bug Fixes
+
+* bumped deps ([45f4533](https://github.com/postalsys/email-text-tools/commit/45f453390e00a8b5dea00c0ab3a7b4a742e9b3ce))
+* Bumped deps ([519eb91](https://github.com/postalsys/email-text-tools/commit/519eb913a2aa91afe2eb1c782186f4f043ce1c55))
+* Bumped deps ([00af333](https://github.com/postalsys/email-text-tools/commit/00af333ece8b1e6d14091fda1aea7662f314c721))
+* Bumped deps ([da979c9](https://github.com/postalsys/email-text-tools/commit/da979c9feef5c8fd4e08b9967cbffcc058a70677))
+* **deploy:** Set up automatic deployment ([21e55be](https://github.com/postalsys/email-text-tools/commit/21e55be18bb2ac1b991ee6000928c429a5b09ddd))
+* **deploy:** Set up automatic deployment ([c816aaf](https://github.com/postalsys/email-text-tools/commit/c816aafa0457318cfd84497dfcd4e5628503c5b4))
+* **deps:** Bumped deps ([3b71891](https://github.com/postalsys/email-text-tools/commit/3b71891b2c6bcb5d87fb9f583a2aec221bcb142f))
+* **deps:** Bumped deps ([498e56a](https://github.com/postalsys/email-text-tools/commit/498e56a011321f2f437c461008724ca07233eb41))
+* **deps:** Bumped deps ([59e44d8](https://github.com/postalsys/email-text-tools/commit/59e44d8cb0877e407becac7ef6744a4dfcdba083))
+* **deps:** Bumped deps ([4f8a120](https://github.com/postalsys/email-text-tools/commit/4f8a1208b2841d343baf610c1391788b60b4297c))
+* **deps:** Bumped deps ([a6711a1](https://github.com/postalsys/email-text-tools/commit/a6711a1938d8e2e75f5afd83b5a8c443be0adb9c))
+* **deps:** Bumped deps ([15233fa](https://github.com/postalsys/email-text-tools/commit/15233fa7850f3227bfbc4f06500f0f267e651913))
+* **deps:** Bumped deps ([4815314](https://github.com/postalsys/email-text-tools/commit/4815314f9d36da2b2163d6990acc8f68fc1bc356))
+* **deps:** Bumped deps (juice) ([69eaee3](https://github.com/postalsys/email-text-tools/commit/69eaee36cceadbbf5ebf23caaf24385c38859a03))
+* **deps:** fixed deps ([ccf26e2](https://github.com/postalsys/email-text-tools/commit/ccf26e2f0f8047482b9cc7e71cd0a3e61b286ddc))
+* **deps:** removed js-beautify ([a73ccc9](https://github.com/postalsys/email-text-tools/commit/a73ccc97a4acf9bfa7e439939c41869c2554b073))
+* Downgraded jsdom to 27.0.0 ([a2969e9](https://github.com/postalsys/email-text-tools/commit/a2969e9399ed6c9d15a85d7d8c11342bc5bf00ce))
+* **htmlToText:** Improve HTML-to-text conversion for better newline preservation ([6606d5c](https://github.com/postalsys/email-text-tools/commit/6606d5c5b9d3b05f41d54c434f2b68760141dacb))
+* **mime-html:** ensure async version pre-filters problematic CSS selectors ([5166f71](https://github.com/postalsys/email-text-tools/commit/5166f714b8532c62aa33c76b2b4e2ac3c8642ca6))
+* remove registry-url to enable OIDC authentication for trusted publishing ([319e61e](https://github.com/postalsys/email-text-tools/commit/319e61ed7c83af3db4f0a58f4b5b85c296f6f6a6))
+* removed unneeded console log lines ([3a10214](https://github.com/postalsys/email-text-tools/commit/3a1021483029a1c99df122241c4e0f6062b91059))
+* rename release-please config file to remove dot prefix ([0bb0343](https://github.com/postalsys/email-text-tools/commit/0bb0343f7c4d35f62b66b159604ba0f19665a177))
+* separate publish job with npm-publish environment for trusted publishing ([1ea55bd](https://github.com/postalsys/email-text-tools/commit/1ea55bdcfa0726f48d927fb970cf900a4cd4943f))
+* trigger release to test npm publishing configuration ([88e7110](https://github.com/postalsys/email-text-tools/commit/88e711007a73a88e0f40b5bfb278826821c1fc6a))
+* upgrade Node.js to version 24 for OIDC trusted publishing support ([fd41ca2](https://github.com/postalsys/email-text-tools/commit/fd41ca22a959c06eb2df4e8b957a0da86f42d9da))
+* upgrade tooling and configure release-please v4 ([4620dd7](https://github.com/postalsys/email-text-tools/commit/4620dd7d67c70486789af35abb1732ee151545c0))
+* **worker-pool:** properly return workers to free list after task completion ([2d6cd2c](https://github.com/postalsys/email-text-tools/commit/2d6cd2c451941932d44d2ce025a5ba867ec66fec))
+
 ## [2.3.5](https://github.com/postalsys/email-text-tools/compare/email-text-tools-v2.3.4...email-text-tools-v2.3.5) (2025-10-29)
 
 
