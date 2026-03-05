@@ -14,7 +14,10 @@ describe('html-to-text conversion', () => {
         assert.ok(text.includes('Line 3'));
 
         // Check that lines are separated
-        const lines = text.trim().split('\n').filter(l => l.trim());
+        const lines = text
+            .trim()
+            .split('\n')
+            .filter(l => l.trim());
         assert.equal(lines.length, 3);
     });
 
@@ -27,7 +30,10 @@ describe('html-to-text conversion', () => {
         assert.ok(text.includes('Line 3'));
 
         // Check that lines are separated
-        const lines = text.trim().split('\n').filter(l => l.trim());
+        const lines = text
+            .trim()
+            .split('\n')
+            .filter(l => l.trim());
         assert.equal(lines.length, 3);
     });
 
@@ -40,7 +46,10 @@ describe('html-to-text conversion', () => {
         assert.ok(text.includes('Paragraph 3'));
 
         // Check that paragraphs are separated
-        const lines = text.trim().split('\n').filter(l => l.trim());
+        const lines = text
+            .trim()
+            .split('\n')
+            .filter(l => l.trim());
         assert.equal(lines.length, 3);
     });
 
@@ -64,7 +73,10 @@ describe('html-to-text conversion', () => {
         assert.ok(text.includes('User'));
 
         // Verify structure is maintained
-        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+        const lines = text
+            .split('\n')
+            .map(l => l.trim())
+            .filter(l => l);
         assert.ok(lines.length >= 5, `Expected at least 5 lines, got ${lines.length}`);
     });
 
@@ -77,7 +89,10 @@ describe('html-to-text conversion', () => {
         assert.ok(text.includes('Item 3'));
 
         // Each list item should be on a new line
-        const lines = text.trim().split('\n').filter(l => l.trim());
+        const lines = text
+            .trim()
+            .split('\n')
+            .filter(l => l.trim());
         assert.ok(lines.length >= 3);
     });
 
@@ -91,7 +106,10 @@ describe('html-to-text conversion', () => {
         assert.ok(text.includes('More content'));
 
         // Headers should create separation
-        const lines = text.trim().split('\n').filter(l => l.trim());
+        const lines = text
+            .trim()
+            .split('\n')
+            .filter(l => l.trim());
         assert.ok(lines.length >= 4);
     });
 
@@ -123,7 +141,10 @@ describe('html-to-text conversion', () => {
         assert.ok(text.includes('Cell 4'));
 
         // Rows should be separated
-        const lines = text.trim().split('\n').filter(l => l.trim());
+        const lines = text
+            .trim()
+            .split('\n')
+            .filter(l => l.trim());
         assert.ok(lines.length >= 2);
     });
 
@@ -160,7 +181,10 @@ describe('html-to-text conversion', () => {
         assert.ok(text.includes('Nested content'));
         assert.ok(text.includes('Last paragraph'));
 
-        const lines = text.trim().split('\n').filter(l => l.trim());
+        const lines = text
+            .trim()
+            .split('\n')
+            .filter(l => l.trim());
         assert.equal(lines.length, 3);
     });
 
@@ -208,7 +232,10 @@ describe('html-to-text conversion', () => {
         assert.ok(text.includes('John'));
 
         // Check structure is preserved
-        const lines = text.trim().split('\n').filter(l => l.trim());
+        const lines = text
+            .trim()
+            .split('\n')
+            .filter(l => l.trim());
         assert.ok(lines.length >= 7, `Expected at least 7 content lines, got ${lines.length}`);
 
         // Items should be on separate lines
