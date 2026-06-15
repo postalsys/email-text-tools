@@ -26,12 +26,12 @@
     "homepage": "https://github.com/postalsys/email-text-tools#readme",
     "devDependencies": {
         "@eslint/js": "10.0.1",
-        "eslint": "10.4.0",
+        "eslint": "10.5.0",
         "eslint-config-prettier": "10.1.8",
-        "prettier": "3.8.3"
+        "prettier": "3.8.4"
     },
     "dependencies": {
-        "dompurify": "3.4.7",
+        "dompurify": "3.4.10",
         "he": "1.2.0",
         "html-to-text": "10.0.0",
         "jsdom": "27.0.0",
