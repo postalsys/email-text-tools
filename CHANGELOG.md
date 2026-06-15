@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.7](https://github.com/postalsys/email-text-tools/compare/v2.4.6...v2.4.7) (2026-06-15)
+
+
+### Bug Fixes
+
+* pin juice to 11.x and bump remaining deps ([307a337](https://github.com/postalsys/email-text-tools/commit/307a3379713624a2eee5897ee7a4755232935792))
+
 ## [2.4.6](https://github.com/postalsys/email-text-tools/compare/v2.4.5...v2.4.6) (2026-05-29)
 
 
