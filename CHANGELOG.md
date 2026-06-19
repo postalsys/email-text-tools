@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.8](https://github.com/postalsys/email-text-tools/compare/v2.4.7...v2.4.8) (2026-06-19)
+
+
+### Bug Fixes
+
+* bump dompurify to 3.4.11 (GHSA-cmwh-pvxp-8882) ([db309e5](https://github.com/postalsys/email-text-tools/commit/db309e54fd5758428d3dfa7037f9202fc1977a10))
+
 ## [2.4.7](https://github.com/postalsys/email-text-tools/compare/v2.4.6...v2.4.7) (2026-06-15)
 
 
