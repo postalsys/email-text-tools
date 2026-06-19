@@ -31,7 +31,7 @@
         "prettier": "3.8.4"
     },
     "dependencies": {
-        "dompurify": "3.4.10",
+        "dompurify": "3.4.11",
         "he": "1.2.0",
         "html-to-text": "10.0.0",
         "jsdom": "27.0.0",
