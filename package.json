@@ -38,7 +38,7 @@
         "juice": "11.1.1",
         "linkify-it": "5.0.1",
         "moment-timezone": "0.6.2",
-        "node-html-parser": "7.1.0",
+        "node-html-parser": "8.0.3",
         "tlds": "1.261.0"
     }
 }
