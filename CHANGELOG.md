@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.10](https://github.com/postalsys/email-text-tools/compare/v2.4.9...v2.4.10) (2026-07-05)
+
+
+### Bug Fixes
+
+* pin node-html-parser to 7.1.0 to keep the dependency tree CommonJS ([9931194](https://github.com/postalsys/email-text-tools/commit/99311943d05159f2d99ede14f46713da7171d889))
+
 ## [2.4.9](https://github.com/postalsys/email-text-tools/compare/v2.4.8...v2.4.9) (2026-06-26)
 
 
