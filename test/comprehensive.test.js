@@ -37,6 +37,15 @@ describe('Comprehensive Test Suite', () => {
             assert.ok(html.includes('https://example.com'));
         });
 
+        it('should linkify bare domains without a scheme', () => {
+            // linkify-it 6 stopped doing this by default, which silently dropped
+            // autolinking for plain text emails, so keep it covered
+            const html = textToHtml('Visit example.com and www.example.org today');
+
+            assert.ok(html.includes('<a href="http://example.com">example.com</a>'));
+            assert.ok(html.includes('<a href="http://www.example.org">www.example.org</a>'));
+        });
+
         it('should handle email addresses', () => {
             const text = 'Contact me at test@example.com';
             const html = textToHtml(text);
