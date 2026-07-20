@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.11](https://github.com/postalsys/email-text-tools/compare/v2.4.10...v2.4.11) (2026-07-20)
+
+
+### Bug Fixes
+
+* **deps:** update dompurify and moment-timezone ([372ab61](https://github.com/postalsys/email-text-tools/commit/372ab6172b60b2096041111bdc47dad0b33da50f))
+
 ## [2.4.10](https://github.com/postalsys/email-text-tools/compare/v2.4.9...v2.4.10) (2026-07-05)
 
 
