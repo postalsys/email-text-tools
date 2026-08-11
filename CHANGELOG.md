@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.12](https://github.com/postalsys/email-text-tools/compare/v2.4.11...v2.4.12) (2026-08-11)
+
+
+### Bug Fixes
+
+* **deps:** update dompurify to 3.4.13 to address GHSA-55q2-fjhq-7xh7 ([416bad2](https://github.com/postalsys/email-text-tools/commit/416bad2b79ea7b8d45abd66612da862cbbb5b4e3))
+
 ## [2.4.11](https://github.com/postalsys/email-text-tools/compare/v2.4.10...v2.4.11) (2026-07-20)
 
 
