@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.14](https://github.com/postalsys/email-text-tools/compare/v2.4.13...v2.4.14) (2026-08-24)
+
+
+### Bug Fixes
+
+* **deps:** update html-to-text to 10.0.1 and dompurify to 3.4.14 ([cd9a19b](https://github.com/postalsys/email-text-tools/commit/cd9a19b877d903f88b31bf3888aaae92a3e2c4b9))
+
 ## [2.4.13](https://github.com/postalsys/email-text-tools/compare/v2.4.12...v2.4.13) (2026-08-17)
 
 
