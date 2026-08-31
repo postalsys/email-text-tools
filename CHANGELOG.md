@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.15](https://github.com/postalsys/email-text-tools/compare/v2.4.14...v2.4.15) (2026-08-31)
+
+
+### Bug Fixes
+
+* **deps:** update node-html-parser to 9.0.2 ([f239726](https://github.com/postalsys/email-text-tools/commit/f239726cc5f4267c76c79478c2e8216d7c54276a))
+
 ## [2.4.14](https://github.com/postalsys/email-text-tools/compare/v2.4.13...v2.4.14) (2026-08-24)
 
 
