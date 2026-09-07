@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.4.16](https://github.com/postalsys/email-text-tools/compare/v2.4.15...v2.4.16) (2026-09-07)
+
+
+### Bug Fixes
+
+* declare the Node 20 floor this package already has ([69c6c7d](https://github.com/postalsys/email-text-tools/commit/69c6c7dfc41cf37bb6d609bf80263ad9b77b143f))
+* **deps:** update dompurify to 3.4.15 and node-html-parser to 9.0.4 ([498f750](https://github.com/postalsys/email-text-tools/commit/498f750c206bf10a6055550b17bd22206179b8d7))
+
 ## [2.4.15](https://github.com/postalsys/email-text-tools/compare/v2.4.14...v2.4.15) (2026-08-31)
 
 
