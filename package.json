@@ -20,6 +20,9 @@
     "keywords": [],
     "author": "Postal Systems OÜ",
     "license": "MIT",
+    "engines": {
+        "node": ">=20.0.0"
+    },
     "bugs": {
         "url": "https://github.com/postalsys/email-text-tools/issues"
     },
