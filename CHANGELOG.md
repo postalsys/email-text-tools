@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.17](https://github.com/postalsys/email-text-tools/compare/v2.4.16...v2.4.17) (2026-09-28)
+
+
+### Bug Fixes
+
+* linear CSS pre-filter, bounded nesting, Intl dates, lazy jsdom, forms removed by the sanitiser ([9ed33c9](https://github.com/postalsys/email-text-tools/commit/9ed33c90b7b8c286b11bfc522baef75899a07325))
+
 ## [2.4.16](https://github.com/postalsys/email-text-tools/compare/v2.4.15...v2.4.16) (2026-09-07)
 
 
