@@ -277,7 +277,8 @@ describe('Comprehensive Test Suite', () => {
     describe('worker pool configuration', () => {
         it('should respect min/max worker settings', async () => {
             const input = {
-                html: '<p>Pool config test</p>'
+                // juice, and with it the pool, only runs when there is a style sheet to inline
+                html: '<style>p { color: red; }</style><p>Pool config test</p>'
             };
 
             // First close any existing pool
@@ -328,7 +329,8 @@ describe('Comprehensive Test Suite', () => {
     describe('memory leak prevention', () => {
         it('should clean up workers after timeout', async () => {
             const input = {
-                html: '<p>Timeout test</p>'
+                // a style sheet, so the juice worker actually runs and times out
+                html: '<style>p { color: red; }</style><p>Timeout test</p>'
             };
 
             try {

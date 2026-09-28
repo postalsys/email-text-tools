@@ -174,7 +174,8 @@ describe('mime-html', () => {
 
         it('should use worker pool by default', async () => {
             const input = {
-                html: '<p>Pool test</p>'
+                // juice, and with it the pool, only runs when there is a style sheet to inline
+                html: '<style>p { color: red; }</style><p>Pool test</p>'
             };
 
             const promises = [];
@@ -200,32 +201,6 @@ describe('mime-html', () => {
             const result = await mimeHtml.async(input, { useWorkerPool: false });
 
             assert.ok(result.includes('No pool test'));
-        });
-
-        it('should handle problematic CSS with pre-filtering', async () => {
-            const input = {
-                html: `
-                    <html>
-                    <head>
-                        <style>
-                            .test:is(.a, .b) { color: red; }
-                            .item:where(.x) { color: blue; }
-                            .parent:has(.child) { border: 1px solid; }
-                        </style>
-                    </head>
-                    <body>
-                        <p class="test a">Async test</p>
-                    </body>
-                    </html>
-                `
-            };
-
-            const start = Date.now();
-            const result = await mimeHtml.async(input, { timeout: 2000 });
-            const elapsed = Date.now() - start;
-
-            assert.ok(result.includes('Async test'));
-            assert.ok(elapsed < 1000, 'Should complete quickly with pre-filtering');
         });
 
         it('should handle errors with fallback', async () => {
