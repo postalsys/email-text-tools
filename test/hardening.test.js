@@ -146,8 +146,8 @@ describe('hostile input hardening', () => {
             assert.ok(result.startsWith(FALLBACK_PREFIX));
             assert.ok(result.includes('hello &lt;img'));
             assert.doesNotMatch(result, /<img/);
-            // text below the html-to-text depth limit is dropped
-            assert.doesNotMatch(result, /deep/);
+            // the fallback strips tags itself, so text below any parser depth limit survives
+            assert.ok(result.includes('deep'));
             assert.ok(ms < 10000, `took ${ms} ms`);
         });
 
@@ -155,6 +155,7 @@ describe('hostile input hardening', () => {
             const { result, ms } = timed(() => mimeHtml({ html: 'shallow' + '<b>'.repeat(50000) + 'bold' }));
             assert.ok(result.startsWith(FALLBACK_PREFIX));
             assert.ok(result.includes('shallow'));
+            assert.ok(result.includes('bold'));
             assert.ok(ms < 15000, `took ${ms} ms`);
         });
 
@@ -198,6 +199,25 @@ describe('hostile input hardening', () => {
             const result = await mimeHtml.async({ html: 'async shallow' + '<div>'.repeat(4000) + 'async deep' });
             assert.ok(result.startsWith(FALLBACK_PREFIX));
             assert.ok(result.includes('async shallow'));
+            assert.ok(result.includes('async deep'));
+        });
+
+        it('the fallback keeps the text of an over-deep body that has no plain part', async () => {
+            const html = '<style>.x{color:red}</style><script>alert(1)</script>' + '<div>'.repeat(4000) + 'only &lt;html&gt; deep' + '</div>'.repeat(4000);
+            const result = await mimeHtml.async({ html });
+            assert.ok(result.startsWith(FALLBACK_PREFIX));
+            assert.ok(result.includes('only &lt;html&gt; deep'));
+            assert.ok(!result.includes('<div>'));
+            assert.ok(!result.includes('color:red'));
+            assert.ok(!result.includes('alert(1)'));
+        });
+
+        it('the fallback drops an unterminated style block and tag instead of rendering them', async () => {
+            const result = await mimeHtml.async({ html: 'kept <style>.x{}' + '<div>'.repeat(4000) });
+            assert.ok(result.includes('kept'));
+            assert.ok(!result.includes('.x{}'));
+            const unterminated = await mimeHtml.async({ html: 'kept <div' + '<div>'.repeat(4000) });
+            assert.ok(unterminated.includes('kept'));
         });
 
         it('mimeHtml.async rejects on hostile nesting with fallbackOnError: false', async () => {
