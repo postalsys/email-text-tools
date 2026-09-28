@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.18](https://github.com/postalsys/email-text-tools/compare/v2.4.17...v2.4.18) (2026-09-28)
+
+
+### Bug Fixes
+
+* keep the text of an over-deep HTML body in the fallback rendering ([a2e06b7](https://github.com/postalsys/email-text-tools/commit/a2e06b75878d3763bb35d225a93225aa6a3f18ab))
+
 ## [2.4.17](https://github.com/postalsys/email-text-tools/compare/v2.4.16...v2.4.17) (2026-09-28)
 
 
