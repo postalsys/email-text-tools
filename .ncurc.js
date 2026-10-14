@@ -13,6 +13,10 @@ module.exports = {
         // 6.0.0 changed the CommonJS export shape (named bindings instead of the constructor) and,
         // more importantly, stopped linkifying bare domains such as 'example.com' or 'www.example.org'
         // by default, which silently breaks autolinking in plain text emails. Stay on 5.x.
-        'linkify-it'
+        'linkify-it',
+        // 2.0.0 is ESM-only (exports only src/he.mjs) and requires Node >=22, so require('he') throws
+        // and pkg cannot bundle it. 1.2.0 is the last CommonJS release; EmailEngine and mailparser
+        // hold it there too, and a different copy here would be a second he in their trees
+        'he'
     ]
 };
