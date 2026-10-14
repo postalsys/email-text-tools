@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.19](https://github.com/postalsys/email-text-tools/compare/v2.4.18...v2.4.19) (2026-10-14)
+
+
+### Bug Fixes
+
+* **deps:** update dompurify to 3.4.17 and hold he on 1.x ([7a900b0](https://github.com/postalsys/email-text-tools/commit/7a900b03f4fbf4001bb21dffa62c659a89917e74))
+
 ## [2.4.18](https://github.com/postalsys/email-text-tools/compare/v2.4.17...v2.4.18) (2026-09-28)
 
 
