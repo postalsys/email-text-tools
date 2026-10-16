@@ -231,6 +231,19 @@ describe('hostile input hardening', () => {
             assert.equal(mimeHtml.getWorkerPoolStats(), null);
         });
 
+        it('mimeHtml depth check is not bypassed by end tags that close nothing', () => {
+            // the check counted every end tag down, so "<b></i>" repeated passed it while the
+            // parser, which ignores the </i>, nested the <b> tags: 10,000 copies took 9.7 s
+            const { result, ms } = timed(() => mimeHtml({ html: '<b></i>'.repeat(10000) + 'deep' }));
+            assert.ok(result.startsWith(FALLBACK_PREFIX));
+            assert.ok(result.includes('deep'));
+            assert.ok(ms < 1500, `took ${ms} ms`);
+            // an end tag still closes what it names, including what was opened inside it
+            const nested = mimeHtml({ html: '<div><span><b>x</div>'.repeat(2000) + 'shallow' });
+            assert.ok(!nested.startsWith(FALLBACK_PREFIX));
+            assert.ok(nested.includes('shallow'));
+        });
+
         it('htmlToText does not overflow the stack on deep nesting', () => {
             for (const tag of ['div', 'b', 'blockquote']) {
                 const html = 'hello &amp; <b>world</b>' + `<${tag}>`.repeat(20000) + 'deep' + `</${tag}>`.repeat(20000) + 'after';
@@ -240,6 +253,104 @@ describe('hostile input hardening', () => {
                 // content below the depth limit is dropped
                 assert.ok(!text.includes('deep'), text);
             }
+        });
+    });
+
+    describe('CSS inlining caps', () => {
+        const SKIPPED_PREFIX = '<div style="overflow: auto;" data-css-inlining="skipped">';
+
+        function styled(css, body) {
+            return `<html><head><style>${css}</style></head><body>${body}</body></html>`;
+        }
+
+        function rules(count, selector) {
+            let css = '';
+            for (let i = 0; i < count; i++) {
+                css += `${selector || '.c' + i} { color: #${(i % 4096).toString(16).padStart(3, '0')}; }\n`;
+            }
+            return css;
+        }
+
+        it('skips inlining when the selectors times the elements is too much work', () => {
+            // 10,000 rules on 10,000 paragraphs took 25 s in juice, on the calling thread
+            const html = styled(rules(10000, 'p'), '<p>x</p>'.repeat(10000));
+            const { result, ms } = timed(() => mimeHtml({ html }));
+            assert.ok(ms < 3000, `took ${ms} ms`);
+            assert.ok(result.startsWith(SKIPPED_PREFIX), result.slice(0, 80));
+            assert.ok(result.includes('<p>x</p>'));
+            assert.doesNotMatch(result, /color:/);
+        });
+
+        it('counts every selector of a rule, not every rule', () => {
+            const html = styled(`${'p, '.repeat(9999)}p { color: red; }`, '<p>x</p>'.repeat(10000));
+            const result = mimeHtml({ html });
+            assert.ok(result.startsWith(SKIPPED_PREFIX), result.slice(0, 80));
+        });
+
+        it('skips inlining past the selector cap or the element cap on their own', () => {
+            const manyRules = mimeHtml({ html: styled(rules(5001), '<p class="c1">x</p>') });
+            assert.ok(manyRules.startsWith(SKIPPED_PREFIX), manyRules.slice(0, 80));
+            const manyElements = mimeHtml({ html: styled('p { color: red; }', '<i></i>'.repeat(50001)) });
+            assert.ok(manyElements.startsWith(SKIPPED_PREFIX), manyElements.slice(0, 80));
+        });
+
+        it('inlines a large but ordinary message', () => {
+            // rules nested in a media query are not matched against elements and do not count
+            const css = `${rules(2000)}p.x { color: blue; }\n@media screen { ${rules(4000)} }`;
+            const result = mimeHtml({ html: styled(css, '<p class="x">y</p>'.repeat(2000)) });
+            assert.ok(result.startsWith('<div style="overflow: auto;"><p'), result.slice(0, 80));
+            assert.match(result, /color: blue/);
+        });
+
+        it('mimeHtml.async skips the same way', async () => {
+            const html = styled(rules(10000, 'p'), '<p>x</p>'.repeat(10000));
+            const result = await mimeHtml.async({ html });
+            assert.ok(result.startsWith(SKIPPED_PREFIX), result.slice(0, 80));
+            assert.ok(result.includes('<p>x</p>'));
+        });
+    });
+
+    describe('inlineHtml parse guard', () => {
+        const FALLBACK_BODY = '<div style="white-space: pre-wrap;">';
+
+        it('does not spend seconds on tags left open in the quoted message', () => {
+            // 16 KB of "<b>x" took node-html-parser 10.6 s to clean up
+            const { result, ms } = timed(() => inlineHtml('reply', '<p>my reply</p>', { html: '<b>x'.repeat(4000) }));
+            assert.ok(ms < 1000, `took ${ms} ms`);
+            assert.ok(result.includes('my reply'));
+            assert.ok(result.includes(FALLBACK_BODY));
+            assert.ok(!result.includes('<b>'));
+            assert.ok(/x x x/.test(result));
+        });
+
+        for (const [label, html] of [
+            ['end tags that close nothing', '<b></i>'.repeat(5000) + 'deep'],
+            ['end tags the parser ignores', '<td><font>x</td>'.repeat(3000)],
+            ['padded end tags', '<a><b><c>y</a></b>'.repeat(3000)],
+            ['rows left open', '<table>' + '<tr><td>cell'.repeat(5000)]
+        ]) {
+            it(`stays fast on ${label}`, () => {
+                const { result, ms } = timed(() => inlineHtml('forward', '<p>fyi</p>', { html }));
+                assert.ok(ms < 1000, `took ${ms} ms`);
+                assert.ok(result.includes('fyi'));
+                assert.ok(result.includes('<blockquote'));
+            });
+        }
+
+        it('guards the new content the same way', () => {
+            const { result, ms } = timed(() => inlineHtml('reply', '<b>x'.repeat(4000), { html: '<p>Original</p>' }));
+            assert.ok(ms < 1000, `took ${ms} ms`);
+            assert.ok(result.includes('<p>Original</p>'));
+            assert.ok(result.includes(FALLBACK_BODY));
+        });
+
+        it('keeps the quoted body of ordinary and sloppy markup', () => {
+            const result = inlineHtml('reply', '<p>r</p>', { html: '<html><body><div><b>bold text<p>para</body></html>' });
+            assert.ok(result.includes('bold text'));
+            assert.ok(result.includes('<b>'));
+            // only the reply template's own body element is left
+            assert.equal((result.match(/<body/g) || []).length, 1);
+            assert.ok(!result.includes(FALLBACK_BODY));
         });
     });
 
@@ -360,5 +471,34 @@ describe('forbidden style properties behind CSS escapes', () => {
         assert.ok(!/position/i.test(out), out);
         assert.ok(!/float/i.test(out), out);
         assert.ok(/color:\s*red/i.test(out), out);
+    });
+});
+
+describe('forbidden style properties the CSSOM could not parse', () => {
+    it('drops a style attribute cssstyle rejected that names a forbidden property', () => {
+        // cssstyle 5 parses nothing from an attribute whose background shorthand with a url() is
+        // followed by more declarations, so the raw text went out verbatim and a browser, which
+        // parses it fine, honored the position
+        const out = mimeHtml({ html: '<div style="background:url(https://example.com/x.gif) no-repeat; position:fixed; top:0">x</div>' });
+        assert.ok(!/position|fixed|top:/i.test(out), out);
+        assert.ok(out.includes('<div>x</div>'), out);
+    });
+
+    it('keeps the declarations the CSSOM parsed around one it could not', () => {
+        const out = mimeHtml({ html: '<div style="color:red;}position:fixed;top:0">x</div>' });
+        assert.ok(!/position|fixed/i.test(out), out);
+        assert.match(out, /color: red/);
+        assert.match(out, /top: 0/);
+    });
+
+    it('leaves an attribute that names no forbidden property as it was, parsed or not', () => {
+        const out = mimeHtml({ html: '<div style="background:url(clear.gif); color:red">x</div>' });
+        assert.ok(out.includes('style="background:url(clear.gif); color:red"'), out);
+    });
+
+    it('does not take a longer property name for a forbidden one', () => {
+        const out = mimeHtml({ html: '<div style="background-position: center top; text-underline-offset: 2px; color:red">x</div>' });
+        assert.ok(out.includes('background-position: center top'), out);
+        assert.ok(out.includes('text-underline-offset: 2px'), out);
     });
 });
