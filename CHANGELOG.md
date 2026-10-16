@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.4.20](https://github.com/postalsys/email-text-tools/compare/v2.4.19...v2.4.20) (2026-10-16)
+
+
+### Bug Fixes
+
+* bound CSS inlining, guard inlineHtml like mimeHtml and drop style attributes the CSSOM could not parse ([13b2725](https://github.com/postalsys/email-text-tools/commit/13b27254ae31a2aeab56a3edd7dd84737fa016cd))
+* bump @postalsys/email-content to 0.1.13 ([1a8738d](https://github.com/postalsys/email-text-tools/commit/1a8738da39f1adc404f871ab63c8dda5d3733dd2))
+
 ## [2.4.19](https://github.com/postalsys/email-text-tools/compare/v2.4.18...v2.4.19) (2026-10-14)
 
 
