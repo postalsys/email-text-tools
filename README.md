@@ -11,6 +11,12 @@ Email text tools
 - CSS rules whose selector uses `:is()`, `:where()`, `:has()` or a `:not()` containing another pseudo-class, and any `<style>` text beyond 256 KB per message
 - CSS inlining altogether when the style text holds more than 5,000 selectors, the document more than 50,000 elements, or the product of the two exceeds 5,000,000 (inlining costs one selector match per element). The sanitized HTML is then returned with its `<style>` rules dropped and `data-css-inlining="skipped"` on the wrapper `<div>`
 - a `style` attribute that still names a forbidden property after the CSSOM has filtered it, which means the CSSOM could not parse that declaration: the attribute is reduced to the declarations it did parse, or removed
+- SVG and MathML (DOMPurify runs with the `html` profile only): the namespace confusion between the three is where most sanitizer bypasses have come from, and mail has no use for either
+- `width`, `min-width`, `max-width`, `height`, `min-height` and `max-height` from the body's own style, which would otherwise size the container the host gave the message
+
+The output is two wrappers: an outer `<div style="overflow: auto;">` that is never given anything else, and inside it a `<div>` carrying the sanitized styles of the message body. Everything the body does (its margins, a `display: contents`, a box-shadow) is clipped by the outer element, and `position` is forbidden on every element because it is the one property that escapes an overflow clip. Every `a` and `area` gets `target="_blank" rel="noopener noreferrer"`, whatever `rel` it came with.
+
+Markup without a `<style>` start tag is sanitized once; the first pass exists to find and filter the stylesheets before they are inlined.
 
 Input nested more than about 1000 elements deep, or that the parser cannot process, is rendered as escaped plain text instead of throwing. `inlineHtml()` applies the same depth limit to the quoted message and to the new content, and quotes escaped text instead when it is exceeded.
 
