@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.25](https://github.com/postalsys/email-text-tools/compare/v2.4.24...v2.4.25) (2026-10-18)
+
+
+### Bug Fixes
+
+* bump @postalsys/email-content to 0.1.16 ([2c31e98](https://github.com/postalsys/email-text-tools/commit/2c31e98d087937e677c1a2f7d6f066d18148d788))
+
 ## [2.4.24](https://github.com/postalsys/email-text-tools/compare/v2.4.23...v2.4.24) (2026-10-18)
 
 
