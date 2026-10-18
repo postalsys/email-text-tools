@@ -257,7 +257,7 @@ describe('hostile input hardening', () => {
     });
 
     describe('CSS inlining caps', () => {
-        const SKIPPED_PREFIX = '<div style="overflow: auto;" data-css-inlining="skipped">';
+        const SKIPPED_PREFIX = '<div style="overflow: auto; contain: paint;" data-css-inlining="skipped">';
 
         function styled(css, body) {
             return `<html><head><style>${css}</style></head><body>${body}</body></html>`;
@@ -298,7 +298,7 @@ describe('hostile input hardening', () => {
             // rules nested in a media query are not matched against elements and do not count
             const css = `${rules(2000)}p.x { color: blue; }\n@media screen { ${rules(4000)} }`;
             const result = mimeHtml({ html: styled(css, '<p class="x">y</p>'.repeat(2000)) });
-            assert.ok(result.startsWith('<div style="overflow: auto;"><div><p'), result.slice(0, 80));
+            assert.ok(result.startsWith('<div style="overflow: auto; contain: paint;"><div><p'), result.slice(0, 80));
             assert.match(result, /color: blue/);
         });
 
@@ -451,7 +451,7 @@ describe('hostile input hardening', () => {
             assert.equal(afterText, false);
             assert.equal(afterMime, true);
             assert.equal(asyncType, 'function');
-            assert.equal(out, '<div style="overflow: auto;"><div><p>x</p></div></div>');
+            assert.equal(out, '<div style="overflow: auto; contain: paint;"><div><p>x</p></div></div>');
         });
 
         it('keeps mimeHtml enumerable and destructurable', () => {

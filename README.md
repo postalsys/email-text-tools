@@ -14,7 +14,7 @@ Email text tools
 - SVG and MathML (DOMPurify runs with the `html` profile only): the namespace confusion between the three is where most sanitizer bypasses have come from, and mail has no use for either
 - `width`, `min-width`, `max-width`, `height`, `min-height` and `max-height` from the body's own style, which would otherwise size the container the host gave the message
 
-The output is two wrappers: an outer `<div style="overflow: auto;">` that is never given anything else, and inside it a `<div>` carrying the sanitized styles of the message body. Everything the body does (its margins, a `display: contents`, a box-shadow) is clipped by the outer element, and `position` is forbidden on every element because it is the one property that escapes an overflow clip. Every `a` and `area` gets `target="_blank" rel="noopener noreferrer"`, whatever `rel` it came with.
+The output is two wrappers: an outer `<div style="overflow: auto; contain: paint;">` that is never given anything else, and inside it a `<div>` carrying the sanitized styles of the message body. Everything the body does (its margins, a `display: contents`, a box-shadow) is clipped by the outer element. `position` is forbidden on every element because it is the one property that escapes an overflow clip, and the paint containment makes the outer element the containing block of a fixed or absolute descendant in case one slips through. Every `a` and `area` gets `target="_blank" rel="noopener noreferrer"`, whatever `rel` it came with.
 
 Markup without a `<style>` start tag is sanitized once; the first pass exists to find and filter the stylesheets before they are inlined.
 

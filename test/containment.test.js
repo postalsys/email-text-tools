@@ -9,7 +9,7 @@ const { mimeHtml } = require('..');
 
 describe('container', () => {
     it('wraps a message with no body styles in a bare inner element', () => {
-        assert.equal(mimeHtml({ html: '<p>x</p>' }), '<div style="overflow: auto;"><div><p>x</p></div></div>');
+        assert.equal(mimeHtml({ html: '<p>x</p>' }), '<div style="overflow: auto; contain: paint;"><div><p>x</p></div></div>');
     });
 
     it('keeps the body styles off the clipping wrapper', () => {
@@ -17,9 +17,8 @@ describe('container', () => {
             '<html><body style="display: contents; margin: -500px; overflow: visible; overflow-x: visible; box-shadow: 0 0 0 9999px red; outline: 9999px solid red; color: red">' +
             '<div style="transform: translateY(-300px)">x</div></body></html>';
         const out = mimeHtml({ html });
-        assert.ok(out.startsWith('<div style="overflow: auto;"><div style="'), out);
         assert.ok(out.endsWith('</div></div>'), out);
-        const inner = /^<div style="overflow: auto;"><div style="([^"]*)">/.exec(out)[1];
+        const inner = /^<div style="overflow: auto; contain: paint;"><div style="([^"]*)">/.exec(out)[1];
         assert.match(inner, /display: contents/);
         assert.match(inner, /margin: -500px/);
         assert.match(inner, /color: red/);
@@ -29,7 +28,7 @@ describe('container', () => {
     it('puts a body rule from the stylesheet on the inner element too', () => {
         const html = '<html><head><style>body { display: contents; margin: -200px; } p { color: red; }</style></head><body><p>x</p></body></html>';
         const out = mimeHtml({ html });
-        assert.ok(out.startsWith('<div style="overflow: auto;"><div style="'), out);
+        assert.ok(out.startsWith('<div style="overflow: auto; contain: paint;"><div style="'), out);
         assert.match(out, /display: contents/);
         assert.match(out, /color: red/);
     });
@@ -46,8 +45,7 @@ describe('container', () => {
     it('drops a body width the CSSOM could not parse', () => {
         // cssstyle parses nothing from this attribute, a browser reads the width
         const out = mimeHtml({ html: '<html><body style="background:url(https://example.com/x.gif) no-repeat; width: 5000px">x</body></html>' });
-        assert.doesNotMatch(out, /width/);
-        assert.equal(out, '<div style="overflow: auto;"><div>x</div></div>');
+        assert.equal(out, '<div style="overflow: auto; contain: paint;"><div>x</div></div>');
     });
 
     it('keeps body styles the CSSOM could not parse when none of them is forbidden', () => {
@@ -70,7 +68,7 @@ describe('container', () => {
             css += `.c${i} { color: red; }\n`;
         }
         const out = mimeHtml({ html: `<html><head><style>${css}</style></head><body style="color: blue"><p class="c1">x</p></body></html>` });
-        assert.ok(out.startsWith('<div style="overflow: auto;" data-css-inlining="skipped"><div style="color: blue">'), out.slice(0, 120));
+        assert.ok(out.startsWith('<div style="overflow: auto; contain: paint;" data-css-inlining="skipped"><div style="color: blue">'), out.slice(0, 120));
     });
 });
 
@@ -109,7 +107,7 @@ describe('single sanitization pass for markup without a stylesheet', () => {
         const out = mimeHtml({
             html: '<p onclick="x()">a</p><script>alert(1)</script><a href="javascript:alert(1)">b</a><iframe src="https://example.com/"></iframe>'
         });
-        assert.equal(out, '<div style="overflow: auto;"><div><p>a</p><a target="_blank" rel="noopener noreferrer">b</a></div></div>');
+        assert.equal(out, '<div style="overflow: auto; contain: paint;"><div><p>a</p><a target="_blank" rel="noopener noreferrer">b</a></div></div>');
     });
 
     for (const [label, tag, close] of [
@@ -125,6 +123,6 @@ describe('single sanitization pass for markup without a stylesheet', () => {
 
     it('leaves a style tag that is only text alone', () => {
         const out = mimeHtml({ html: '<p>write &lt;style&gt; to add rules</p>' });
-        assert.equal(out, '<div style="overflow: auto;"><div><p>write &lt;style&gt; to add rules</p></div></div>');
+        assert.equal(out, '<div style="overflow: auto; contain: paint;"><div><p>write &lt;style&gt; to add rules</p></div></div>');
     });
 });
