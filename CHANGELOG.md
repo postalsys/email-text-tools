@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.23](https://github.com/postalsys/email-text-tools/compare/v2.4.22...v2.4.23) (2026-10-18)
+
+
+### Bug Fixes
+
+* contain the message in a wrapper the sender cannot style, drop SVG, MathML and link openers ([7d79698](https://github.com/postalsys/email-text-tools/commit/7d79698f224c2bd4412d4dcd5d261d17c74022c1))
+
 ## [2.4.22](https://github.com/postalsys/email-text-tools/compare/v2.4.21...v2.4.22) (2026-10-18)
 
 
