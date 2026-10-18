@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.24](https://github.com/postalsys/email-text-tools/compare/v2.4.23...v2.4.24) (2026-10-18)
+
+
+### Bug Fixes
+
+* contain painting in the outer wrapper too ([d1a8f9b](https://github.com/postalsys/email-text-tools/commit/d1a8f9bf2dd4fcad7adb983c243c524703cad79f))
+
 ## [2.4.23](https://github.com/postalsys/email-text-tools/compare/v2.4.22...v2.4.23) (2026-10-18)
 
 
