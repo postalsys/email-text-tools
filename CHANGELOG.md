@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.0](https://github.com/postalsys/email-text-tools/compare/v2.4.26...v2.5.0) (2026-10-19)
+
+
+### Features
+
+* migrate to TypeScript with ES module and CommonJS builds ([b709d60](https://github.com/postalsys/email-text-tools/commit/b709d60a6a43cd842ad60da554d9f6859350c9af))
+
 ## [2.4.26](https://github.com/postalsys/email-text-tools/compare/v2.4.25...v2.4.26) (2026-10-19)
 
 
