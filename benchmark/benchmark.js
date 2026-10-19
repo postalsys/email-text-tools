@@ -281,22 +281,14 @@ class Benchmark {
             };
 
             // Test sync version
-            results.tests.push(
-                await this.runTest(
-                    'Sync',
-                    () => {
-                        return Promise.resolve(mimeHtml.sync({ html: testCase.html }));
-                    },
-                    100
-                )
-            );
+            results.tests.push(await this.runTest('Sync', () => Promise.resolve(mimeHtml.sync({ html: testCase.html })), 100));
 
             // Test async version with pool
             results.tests.push(
                 await this.runTest(
                     'Async (with pool)',
-                    async () => {
-                        return await mimeHtml.async(
+                    async () =>
+                        await mimeHtml.async(
                             { html: testCase.html },
                             {
                                 useWorkerPool: true,
@@ -304,8 +296,7 @@ class Benchmark {
                                 minWorkers: 2,
                                 maxWorkers: 4
                             }
-                        );
-                    },
+                        ),
                     100
                 )
             );
@@ -314,15 +305,14 @@ class Benchmark {
             results.tests.push(
                 await this.runTest(
                     'Async (no pool)',
-                    async () => {
-                        return await mimeHtml.async(
+                    async () =>
+                        await mimeHtml.async(
                             { html: testCase.html },
                             {
                                 useWorkerPool: false,
                                 timeout: 5000
                             }
-                        );
-                    },
+                        ),
                     100
                 )
             );

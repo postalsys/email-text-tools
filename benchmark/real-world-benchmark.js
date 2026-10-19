@@ -117,15 +117,7 @@ class RealWorldBenchmark {
         // Test 1: Sync version
         console.log('Test 1: Sync Version');
         console.log('-'.repeat(40));
-        results.push(
-            await this.runTest(
-                'Sync',
-                () => {
-                    return Promise.resolve(mimeHtml.sync({ html: realWorldHtml }));
-                },
-                50
-            )
-        );
+        results.push(await this.runTest('Sync', () => Promise.resolve(mimeHtml.sync({ html: realWorldHtml })), 50));
 
         // Test 2: Async with worker pool
         console.log('\nTest 2: Async with Worker Pool');
@@ -133,8 +125,8 @@ class RealWorldBenchmark {
         results.push(
             await this.runTest(
                 'Async (pool)',
-                async () => {
-                    return await mimeHtml.async(
+                async () =>
+                    await mimeHtml.async(
                         { html: realWorldHtml },
                         {
                             useWorkerPool: true,
@@ -143,8 +135,7 @@ class RealWorldBenchmark {
                             maxWorkers: 4,
                             logErrors: false
                         }
-                    );
-                },
+                    ),
                 50
             )
         );
@@ -155,16 +146,15 @@ class RealWorldBenchmark {
         results.push(
             await this.runTest(
                 'Async (no pool)',
-                async () => {
-                    return await mimeHtml.async(
+                async () =>
+                    await mimeHtml.async(
                         { html: realWorldHtml },
                         {
                             useWorkerPool: false,
                             timeout: 5000,
                             logErrors: false
                         }
-                    );
-                },
+                    ),
                 10
             )
         );

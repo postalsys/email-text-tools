@@ -142,10 +142,10 @@ async function concurrencyBenchmark() {
     console.log('-'.repeat(40));
 
     const asyncResults = results.filter(r => r.method === 'Async (pool)');
-    const maxThroughput = Math.max(...asyncResults.map(r => parseInt(r.reqPerSec)));
+    const maxThroughput = Math.max(...asyncResults.map(r => parseInt(r.reqPerSec, 10)));
 
     asyncResults.forEach(r => {
-        const barLength = Math.round((parseInt(r.reqPerSec) / maxThroughput) * 30);
+        const barLength = Math.round((parseInt(r.reqPerSec, 10) / maxThroughput) * 30);
         const bar = '█'.repeat(barLength);
         console.log(`  ${String(r.concurrency).padStart(2)}: ${bar} ${r.reqPerSec} req/s`);
     });
