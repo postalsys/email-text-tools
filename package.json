@@ -44,5 +44,8 @@
         "linkify-it": "5.0.2",
         "node-html-parser": "9.0.4",
         "tlds": "1.261.0"
+    },
+    "overrides": {
+        "@asamuzakjp/css-color": "4.1.1"
     }
 }

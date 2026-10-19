@@ -19,6 +19,10 @@ module.exports = {
         // 2.0.0 is ESM-only (exports only src/he.mjs) and requires Node >=22, so require('he') throws
         // and pkg cannot bundle it. 1.2.0 is the last CommonJS release; EmailEngine and mailparser
         // hold it there too, and a different copy here would be a second he in their trees
-        'he'
+        'he',
+        // @asamuzakjp/css-color >=4.1.2 pulls in @csstools/* which are pure ESM, so require(jsdom) fails
+        // without require(esm) (jsdom -> cssstyle -> @asamuzakjp/css-color). Held at 4.1.1 through
+        // package.json "overrides"; overrides do not propagate to consumers, EmailEngine carries its own.
+        '@asamuzakjp/css-color'
     ]
 };
