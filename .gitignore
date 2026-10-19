@@ -107,4 +107,4 @@ dist
 .claude
 
 # Temporary test files
-test-*.js
+test-*.cjs

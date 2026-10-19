@@ -2,6 +2,16 @@
 
 Email text tools
 
+Ships ES module and CommonJS builds with type declarations, Node.js 20 or newer:
+
+```js
+import { mimeHtml, textToHtml } from '@postalsys/email-text-tools';
+// or
+const { mimeHtml, textToHtml } = require('@postalsys/email-text-tools');
+```
+
+`require()` loads `mimeHtml` (and with it jsdom) only on first access; an ES module import loads it up front.
+
 ## mimeHtml sanitizer policy
 
 `mimeHtml()` sanitizes with DOMPurify and additionally removes:

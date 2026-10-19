@@ -1,0 +1,52 @@
+import { compile } from 'html-to-text';
+
+// Post-process function to clean up excessive newlines
+function cleanupNewlines(text: string): string {
+    // Replace 3 or more consecutive newlines with just 2
+    // This handles cases where HTML has many nested empty divs
+    return text.replace(/\n{3,}/g, '\n\n');
+}
+
+const htmlToTextCompiled = compile({
+    wordwrap: 160,
+    selectors: [
+        // Block elements that should preserve line breaks
+        { selector: 'p', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
+        // Divs get minimal breaks - many HTML emails wrap each line in a div
+        { selector: 'div', options: { leadingLineBreaks: 1, trailingLineBreaks: 0 } },
+        { selector: 'pre', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
+        { selector: 'blockquote', options: { leadingLineBreaks: 1, trailingLineBreaks: 1, trimEmptyLines: true } },
+
+        // Headers should have spacing
+        { selector: 'h1', options: { leadingLineBreaks: 2, trailingLineBreaks: 1, uppercase: false } },
+        { selector: 'h2', options: { leadingLineBreaks: 2, trailingLineBreaks: 1, uppercase: false } },
+        { selector: 'h3', options: { leadingLineBreaks: 2, trailingLineBreaks: 1, uppercase: false } },
+        { selector: 'h4', options: { leadingLineBreaks: 2, trailingLineBreaks: 1, uppercase: false } },
+        { selector: 'h5', options: { leadingLineBreaks: 2, trailingLineBreaks: 1, uppercase: false } },
+        { selector: 'h6', options: { leadingLineBreaks: 2, trailingLineBreaks: 1, uppercase: false } },
+
+        // Line breaks
+        { selector: 'br', options: { leadingLineBreaks: 1, trailingLineBreaks: 0 } },
+        { selector: 'hr', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
+
+        // Lists should preserve structure
+        { selector: 'ul', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
+        { selector: 'ol', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
+
+        // Tables
+        { selector: 'table', format: 'dataTable' },
+
+        // Ignore images
+        { selector: 'img', format: 'skip' }
+    ],
+    // Preserve whitespace better for content
+    preserveNewlines: true,
+    // The DOM walk is recursive, so hostile nesting would overflow the stack. Content below this
+    // depth is dropped; real email nests a few dozen levels.
+    limits: { maxDepth: 500, ellipsis: '' }
+});
+
+// Wrapper function that applies post-processing
+export default function htmlToText(html: string): string {
+    return cleanupNewlines(htmlToTextCompiled(html));
+}

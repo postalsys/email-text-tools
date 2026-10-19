@@ -2,17 +2,68 @@
     "name": "@postalsys/email-text-tools",
     "version": "2.4.26",
     "description": "Email text tools",
-    "main": "index.js",
+    "type": "module",
+    "main": "./dist/cjs/index.js",
+    "types": "./dist/cjs/index.d.ts",
+    "typesVersions": {
+        "*": {
+            "lib/*": [
+                "dist/cjs/lib/*"
+            ],
+            "index": [
+                "dist/cjs/index.d.ts"
+            ],
+            "index.js": [
+                "dist/cjs/index.d.ts"
+            ]
+        }
+    },
+    "exports": {
+        ".": {
+            "import": "./dist/esm/index.js",
+            "require": "./dist/cjs/index.js"
+        },
+        "./index": {
+            "import": "./dist/esm/index.js",
+            "require": "./dist/cjs/index.js"
+        },
+        "./index.js": {
+            "import": "./dist/esm/index.js",
+            "require": "./dist/cjs/index.js"
+        },
+        "./lib/*.js": {
+            "import": "./dist/esm/lib/*.js",
+            "require": "./dist/cjs/lib/*.js"
+        },
+        "./lib/*": {
+            "import": "./dist/esm/lib/*.js",
+            "require": "./dist/cjs/lib/*.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE",
+        "CHANGELOG.md",
+        "SECURITY.md"
+    ],
     "scripts": {
-        "test": "node --test test/*.test.js",
-        "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
-        "test:watch": "node --test --watch test/*.test.js",
-        "lint": "eslint .",
+        "build": "node scripts/build.js",
+        "typecheck": "tsc -p tsconfig.json",
+        "pretest": "npm run build",
+        "test": "node --test test/*.test.cjs test/package/*.test.cjs test/package/*.test.mjs",
+        "pretest:coverage": "npm run build",
+        "test:coverage": "node --test --experimental-test-coverage test/*.test.cjs",
+        "test:watch": "node --test --watch test/*.test.cjs",
+        "pretest:cjs": "npm run build",
+        "test:cjs": "NODE_OPTIONS=--no-experimental-require-module node --test test/*.test.cjs test/package/*.test.cjs",
+        "lint": "npm run typecheck && eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
-        "update": "rm -rf node_modules package-lock.json && ncu -u && npm install",
-        "test:cjs": "NODE_OPTIONS=--no-experimental-require-module npm test"
+        "prepare": "npm run build",
+        "update": "rm -rf node_modules package-lock.json && ncu -u && npm install"
     },
     "repository": {
         "type": "git",
@@ -29,11 +80,17 @@
     },
     "homepage": "https://github.com/postalsys/email-text-tools#readme",
     "devDependencies": {
-        "@eslint/js": "10.0.1",
+        "@types/he": "1.2.3",
+        "@types/html-to-text": "9.0.4",
+        "@types/jsdom": "27.0.0",
+        "@types/linkify-it": "5.0.0",
+        "@types/node": "20.19.43",
         "eslint": "10.13.0",
         "eslint-config-prettier": "10.1.8",
         "globals": "17.13.0",
-        "prettier": "3.9.10"
+        "prettier": "3.9.10",
+        "typescript": "6.0.3",
+        "typescript-eslint": "8.71.2"
     },
     "dependencies": {
         "@postalsys/email-content": "0.1.17",
