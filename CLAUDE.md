@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm test                  # run the full suite (node --test test/*.test.js)
+npm run test:cjs          # the suite with require(esm) disabled (CommonJS graph guard)
 npm run test:coverage     # with experimental coverage
 npm run test:watch        # watch mode
 npm run lint              # eslint .
@@ -26,9 +27,17 @@ Benchmarks are not wired into npm scripts; run them directly, e.g. `node benchma
 
 ## Critical constraints
 
-- **CommonJS only, never ESM.** This library is consumed by apps packaged into standalone binaries with [`@yao-pkg/pkg`](https://github.com/yao-pkg/pkg) (the maintained fork of `vercel/pkg`), which snapshots a CommonJS module graph and cannot reliably load pure-ESM packages. So this package, and every dependency it pulls in, must be CommonJS-compatible. All source uses `require`/`module.exports` with a global `'use strict'` (ESLint enforces `sourceType: 'commonjs'`). The constraint is about the module format, not the syntax level: ESLint parses `ecmaVersion: 2022`, which every supported Node (>=20) and pkg target runs natively. `.ncurc.js` has a `reject` list (`nanoid`, `jsdom`, `juice`, `linkify-it`, `he`, each with its reason) blocking upgrades that moved to pure ESM or changed behavior; `npm run update` honors it. Do not add ESM-only dependencies or bump rejected ones; `juice` is pinned to 11.x for this reason (12+ is pure ESM, requires Node >=22.12, breaks pkg builds). The `require('juice').default || require('juice')` idiom at the require sites is a deliberate CJS-interop fallback, not dead code.
+- **CommonJS only, Node 20 minimum.** See Platform constraints below. All source uses `require`/`module.exports` with a global `'use strict'` (ESLint enforces `sourceType: 'commonjs'`). The constraint is about the module format, not the syntax level: ESLint parses `ecmaVersion: 2022`, which every supported Node (>=20) and pkg target runs natively. The `require('juice').default || require('juice')` idiom at the require sites is a deliberate CJS-interop fallback, not dead code.
 - **Releases are automated via release-please.** Version in `package.json` and `CHANGELOG.md` are owned by the bot, do not bump them by hand. Conventional Commits drive it (`fix:` -> patch, `feat:` -> minor); `fix:`/`feat:` commits land directly on `main` and release-please opens the release PR. See Conventions below for the full commit rules.
-- **ESLint uses the shared flat config** (`eslint.config.js`, ESLint 10). It is the CommonJS template shared across the Postal Systems / Nodemailer packages (eslint:recommended plus the retired eslint-config-nodemailer rules, eslint-config-prettier last); keep it identical to the other repos except for the "Repo-specific" block at the end, where each override carries a one-line reason. The only override here turns `no-await-in-loop` off for `benchmark/`, which awaits sequentially on purpose. CI (`.github/workflows/test.yaml`) runs lint, `format:check` and the tests on Node 20, 22 and 24.
+- **ESLint uses the shared flat config** (`eslint.config.js`, ESLint 10). It is the CommonJS template shared across the Postal Systems / Nodemailer packages (eslint:recommended plus the retired eslint-config-nodemailer rules, eslint-config-prettier last); keep it identical to the other repos except for the "Repo-specific" block at the end, where each override carries a one-line reason. The only override here turns `no-await-in-loop` off for `benchmark/`, which awaits sequentially on purpose. CI (`.github/workflows/test.yaml`) runs lint, `format:check` and the tests on Node 20, 22 and 24, plus `npm run test:cjs` on 22 and 24.
+
+## Platform constraints
+
+- **Node.js 20 is the minimum supported version** (`engines.node` is `>=20.0.0`). Runtime code, tests and tooling must work on Node 20, 22 and 24.
+- **Everything that reaches runtime must be genuinely CommonJS-loadable.** EmailEngine consumes this library and ships as a single-file binary built with [`@yao-pkg/pkg`](https://github.com/yao-pkg/pkg), which snapshots a CommonJS module graph and cannot load ES modules. `require()` of this package and of every runtime dependency must work with `--no-experimental-require-module`: Node 22+ (and 20.19) enable require(esm) by default, which hides an ESM-only dependency until the pkg binary fails. A CommonJS entry that only wraps a dynamic `import()` of ESM code does not count.
+- **How to check:** `npm run test:cjs` runs the whole suite under `NODE_OPTIONS=--no-experimental-require-module`; CI runs it on Node 22 and 24.
+- **Pins:** never add or upgrade to an ESM-only dependency. Hold the last CommonJS major in `.ncurc.js` (`reject` or `target`) with a one-line reason; `npm run update` honors it. Currently rejected: `nanoid`, `jsdom` (27.0.1 pulls an ESM-only parse5), `juice` (12+ is pure ESM and needs Node >=22.12), `linkify-it` (6.0.0 changed exports and stopped linkifying bare domains), `he` (2.0.0 is ESM-only), `@asamuzakjp/css-color`.
+- **The jsdom chain:** jsdom -> cssstyle -> `@asamuzakjp/css-color` >=4.1.2 pulls in `@csstools/*` v4, which are pure ESM. `package.json` `"overrides"` holds `@asamuzakjp/css-color` at 4.1.1 so this repo's own tests and CI exercise the CommonJS graph. Overrides do not propagate to consumers: an app installing this package resolves css-color itself, and EmailEngine carries its own identical override and `.ncurc.js` reject.
 
 ## Conventions
 
