@@ -70,8 +70,19 @@ describe('ES module build', () => {
 
 describe('Packed package', () => {
     it('ships both builds and leaves the sources and tests out', () => {
-        // --ignore-scripts: prepare would rebuild dist/ under the running suite
-        const result = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: root, encoding: 'utf8' });
+        // Packs a copy without scripts: npm 10 runs prepare on `npm pack --dry-run` even with
+        // --ignore-scripts, which would rebuild dist/ under the test files running in parallel
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'email-text-tools-pack-'));
+        let result;
+        try {
+            fs.cpSync(root, dir, { recursive: true, filter: source => !/[\\/](node_modules|\.git)$/.test(source) });
+            const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
+            delete manifest.scripts;
+            fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify(manifest));
+            result = spawnSync('npm', ['pack', '--dry-run', '--json'], { cwd: dir, encoding: 'utf8' });
+        } finally {
+            fs.rmSync(dir, { recursive: true, force: true });
+        }
         assert.equal(result.status, 0, result.stderr);
         const files = JSON.parse(result.stdout)[0].files.map(file => file.path);
         for (const format of ['cjs', 'esm']) {
