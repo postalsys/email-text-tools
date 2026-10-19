@@ -71,11 +71,12 @@ describe('ES module build', () => {
 describe('Packed package', () => {
     it('ships both builds and leaves the sources and tests out', () => {
         // Packs a copy without scripts: npm 10 runs prepare on `npm pack --dry-run` even with
-        // --ignore-scripts, which would rebuild dist/ under the test files running in parallel
+        // --ignore-scripts, which would rebuild dist/ under the test files running in parallel.
+        // test/ stays out of the copy too, the worker pool tests create and remove files there
         const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'email-text-tools-pack-'));
         let result;
         try {
-            fs.cpSync(root, dir, { recursive: true, filter: source => !/[\\/](node_modules|\.git)$/.test(source) });
+            fs.cpSync(root, dir, { recursive: true, filter: source => !/[\\/](node_modules|\.git|test)$/.test(source) });
             const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
             delete manifest.scripts;
             fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify(manifest));
