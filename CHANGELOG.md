@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.26](https://github.com/postalsys/email-text-tools/compare/v2.4.25...v2.4.26) (2026-10-19)
+
+
+### Bug Fixes
+
+* bump email-content to 0.1.17 and node-html-parser to 9.0.5 ([e95e4a8](https://github.com/postalsys/email-text-tools/commit/e95e4a840a5d343004c022ccaeaf4caec1d4e142))
+
 ## [2.4.25](https://github.com/postalsys/email-text-tools/compare/v2.4.24...v2.4.25) (2026-10-18)
 
 
