@@ -36,14 +36,14 @@
         "prettier": "3.9.10"
     },
     "dependencies": {
-        "@postalsys/email-content": "0.1.16",
+        "@postalsys/email-content": "0.1.17",
         "dompurify": "3.4.17",
         "he": "1.2.0",
         "html-to-text": "10.0.1",
         "jsdom": "27.0.0",
         "juice": "11.1.1",
         "linkify-it": "5.0.2",
-        "node-html-parser": "9.0.4",
+        "node-html-parser": "9.0.5",
         "tlds": "1.261.0"
     },
     "overrides": {
