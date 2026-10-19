@@ -105,7 +105,6 @@ dist
 
 # Claude Code configuration
 .claude
-CLAUDE.md
 
 # Temporary test files
 test-*.js
