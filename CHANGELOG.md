@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0](https://github.com/postalsys/email-text-tools/compare/v2.5.0...v2.6.0) (2026-10-21)
+
+
+### Features
+
+* export INLINE_STYLE_BLOCK from the package entry ([36b8c30](https://github.com/postalsys/email-text-tools/commit/36b8c305b3841202ae6d7407e80e0c6189d556a6))
+
 ## [2.5.0](https://github.com/postalsys/email-text-tools/compare/v2.4.26...v2.5.0) (2026-10-19)
 
 
