@@ -12,13 +12,24 @@ import { execFile, spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
-import textTools, { textToHtml, htmlToText, inlineHtml, inlineText, mimeHtml } from '@postalsys/email-text-tools';
+import textTools, { textToHtml, htmlToText, inlineHtml, inlineText, mimeHtml, INLINE_STYLE_BLOCK } from '@postalsys/email-text-tools';
 
 const require = createRequire(import.meta.url);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const tsc = require.resolve('typescript/bin/tsc');
 
-const LIB_MODULES = ['format-date', 'html-guard', 'html-to-text', 'inline-html', 'inline-text', 'juice-worker', 'mime-html', 'text-to-html', 'worker-pool'];
+const LIB_MODULES = [
+    'format-date',
+    'html-guard',
+    'html-to-text',
+    'inline-html',
+    'inline-style',
+    'inline-text',
+    'juice-worker',
+    'mime-html',
+    'text-to-html',
+    'worker-pool'
+];
 
 describe('ES module build', () => {
     after(async () => {
@@ -37,9 +48,12 @@ describe('ES module build', () => {
     });
 
     it('exposes named and default exports', async () => {
-        assert.deepEqual(Object.keys(textTools), ['textToHtml', 'htmlToText', 'inlineHtml', 'inlineText', 'mimeHtml']);
+        assert.deepEqual(Object.keys(textTools), ['textToHtml', 'htmlToText', 'inlineHtml', 'inlineText', 'mimeHtml', 'INLINE_STYLE_BLOCK']);
         assert.equal(textTools.textToHtml, textToHtml);
         assert.equal(textTools.mimeHtml, mimeHtml);
+        assert.equal(textTools.INLINE_STYLE_BLOCK, INLINE_STYLE_BLOCK);
+        assert.equal((await import('@postalsys/email-text-tools/lib/inline-style')).INLINE_STYLE_BLOCK, INLINE_STYLE_BLOCK);
+        assert.match(INLINE_STYLE_BLOCK, /^<style>[\s\S]*blockquote[\s\S]*<\/style>$/);
         assert.equal((await import('@postalsys/email-text-tools/lib/mime-html')).default, mimeHtml);
         assert.equal((await import('@postalsys/email-text-tools/lib/inline-html.js')).default, inlineHtml);
         assert.equal(typeof htmlToText, 'function');
@@ -55,6 +69,7 @@ describe('ES module build', () => {
         assert.equal(mimeHtml(message), cjs.mimeHtml(message));
         assert.equal(textToHtml(message.text), cjs.textToHtml(message.text));
         assert.equal(htmlToText(message.html), cjs.htmlToText(message.html));
+        assert.equal(INLINE_STYLE_BLOCK, cjs.INLINE_STYLE_BLOCK);
     });
 
     it('runs juice in the ES module worker of the pool', async () => {
@@ -103,7 +118,7 @@ describe('Packed package', () => {
 // each tsc run has its own temporary project, so they run side by side
 describe('Type declarations', { concurrency: true, timeout: 120 * 1000 }, () => {
     const esmConsumer = `
-import textTools, { mimeHtml, inlineHtml } from '@postalsys/email-text-tools';
+import textTools, { mimeHtml, inlineHtml, INLINE_STYLE_BLOCK } from '@postalsys/email-text-tools';
 import type { QuotedMessage, MimeHtmlAsyncOptions } from '@postalsys/email-text-tools';
 import WorkerPool from '@postalsys/email-text-tools/lib/worker-pool';
 
@@ -113,7 +128,8 @@ export async function run(): Promise<string> {
     const pool = new WorkerPool({ minWorkers: 1 });
     await pool.close();
     const text: string | undefined = textTools.textToHtml('x');
-    return inlineHtml('reply', text, message, { locale: 'en' }) + (await mimeHtml.async({ html: '<p>x</p>' }, options));
+    const style: string = INLINE_STYLE_BLOCK + textTools.INLINE_STYLE_BLOCK;
+    return style + inlineHtml('reply', text, message, { locale: 'en' }) + (await mimeHtml.async({ html: '<p>x</p>' }, options));
 }
 `;
 
@@ -122,7 +138,8 @@ import textTools = require('@postalsys/email-text-tools');
 import mimeHtml = require('@postalsys/email-text-tools/lib/mime-html');
 
 export function run(): string {
-    return textTools.mimeHtml({ text: 'x' }) + mimeHtml.default.sync({ html: '<p>x</p>' }) + textTools.htmlToText('<p>x</p>');
+    const style: string = textTools.INLINE_STYLE_BLOCK;
+    return style + textTools.mimeHtml({ text: 'x' }) + mimeHtml.default.sync({ html: '<p>x</p>' }) + textTools.htmlToText('<p>x</p>');
 }
 `;
 

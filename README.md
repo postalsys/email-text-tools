@@ -12,6 +12,8 @@ const { mimeHtml, textToHtml } = require('@postalsys/email-text-tools');
 
 `require()` loads `mimeHtml` (and with it jsdom) only on first access; an ES module import loads it up front.
 
+`INLINE_STYLE_BLOCK` is the `<style>` block `mimeHtml()` prepends to a message that only has a text body (font and the colours of nested quotes), for a caller that converts text with `textToHtml()` itself and wants the same styling. Reading it does not load jsdom.
+
 ## mimeHtml sanitizer policy
 
 `mimeHtml()` sanitizes with DOMPurify and additionally removes:

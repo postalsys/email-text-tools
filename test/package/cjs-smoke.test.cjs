@@ -30,6 +30,7 @@ describe('CommonJS build', () => {
             'html-guard',
             'html-to-text',
             'inline-html',
+            'inline-style',
             'inline-text',
             'juice-worker',
             'mime-html',
@@ -44,7 +45,9 @@ describe('CommonJS build', () => {
     });
 
     it('keeps the shape of the pre-TypeScript module', () => {
-        assert.deepEqual(Object.keys(tools), ['textToHtml', 'htmlToText', 'inlineHtml', 'inlineText', 'mimeHtml']);
+        assert.deepEqual(Object.keys(tools), ['textToHtml', 'htmlToText', 'inlineHtml', 'inlineText', 'mimeHtml', 'INLINE_STYLE_BLOCK']);
+        assert.equal(tools.INLINE_STYLE_BLOCK, require('@postalsys/email-text-tools/lib/inline-style').INLINE_STYLE_BLOCK);
+        assert.match(tools.INLINE_STYLE_BLOCK, /^<style>[\s\S]*blockquote[\s\S]*<\/style>$/);
         for (const key of ['textToHtml', 'htmlToText', 'inlineHtml', 'inlineText']) {
             const descriptor = Object.getOwnPropertyDescriptor(tools, key);
             assert.ok(descriptor.writable && descriptor.enumerable, key);
@@ -61,6 +64,8 @@ describe('CommonJS build', () => {
         const WorkerPool = require('@postalsys/email-text-tools/lib/worker-pool');
         assert.equal(typeof WorkerPool, 'function');
         assert.equal(WorkerPool.default, WorkerPool);
+
+        assert.deepEqual(Object.keys(require('@postalsys/email-text-tools/lib/inline-style')), ['INLINE_STYLE_BLOCK']);
 
         assert.deepEqual(Object.keys(require('@postalsys/email-text-tools/lib/html-guard')).sort(), [
             'MAX_NESTING_DEPTH',

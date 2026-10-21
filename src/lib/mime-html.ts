@@ -7,6 +7,7 @@ import { Worker } from 'node:worker_threads';
 import WorkerPool from './worker-pool.js';
 import type { WorkerPoolStats } from './worker-pool.js';
 import { MAX_NESTING_DEPTH, exceedsNestingDepth, fallbackText } from './html-guard.js';
+import { INLINE_STYLE_BLOCK } from './inline-style.js';
 import { JUICE_WORKER_PATH } from './commonjs.cjs';
 
 import textToHtml from './text-to-html.js';
@@ -204,41 +205,6 @@ async function juiceWithTimeout(html: string, options: MimeHtmlAsyncOptions = {}
         worker.postMessage(html);
     });
 }
-
-const INLINE_STYLE_BLOCK = `<style>
-
-body, td, th, p {
-    font-family: sans-serif;
-    font-size: 12px;
-}
-
-blockquote {
-    border-left-width: 2px;
-    border-left-style: solid;
-    
-    border-left-color: darkblue;
-    color: darkblue;
-
-    margin: 1rem 0;
-    padding-left: 1rem;
-}
-
-blockquote blockquote{
-    border-left-color: royalblue;
-    color: royalblue;
-}
-
-blockquote blockquote blockquote{
-    border-left-color: dodgerblue;
-    color: dodgerblue;
-}
-
-blockquote blockquote blockquote blockquote{
-    border-left-color: darkblue;
-    color: darkblue;
-}
-
-</style>`;
 
 // Only this much <style> text is kept per message, the rest is dropped. juice and the selector
 // filter below scale with it, and no legitimate email needs more.

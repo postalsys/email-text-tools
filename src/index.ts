@@ -8,14 +8,15 @@ import htmlToText from './lib/html-to-text.js';
 import inlineHtml from './lib/inline-html.js';
 import inlineText from './lib/inline-text.js';
 import mimeHtml from './lib/mime-html.js';
+import { INLINE_STYLE_BLOCK } from './lib/inline-style.js';
 
 export type { FormatDateOptions } from './lib/format-date.js';
 export type { InlineAction, MessageAddress, QuotedMessage } from './lib/inline-html.js';
 export type { MimeHtmlAsyncOptions, MimeHtmlMessage } from './lib/mime-html.js';
 export type { WorkerPoolOptions, WorkerPoolStats } from './lib/worker-pool.js';
 
-export { textToHtml, htmlToText, inlineHtml, inlineText, mimeHtml };
+export { textToHtml, htmlToText, inlineHtml, inlineText, mimeHtml, INLINE_STYLE_BLOCK };
 
-const textTools = { textToHtml, htmlToText, inlineHtml, inlineText, mimeHtml };
+const textTools = { textToHtml, htmlToText, inlineHtml, inlineText, mimeHtml, INLINE_STYLE_BLOCK };
 
 export default textTools;

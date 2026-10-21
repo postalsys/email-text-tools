@@ -89,6 +89,8 @@ A small library exposing five text-transformation functions for email content, a
 | `inlineText` | `src/lib/inline-text.ts`  | build reply/forward plain-text body with quoted original    |
 | `mimeHtml`   | `src/lib/mime-html.ts`    | sanitize + inline-CSS arbitrary email HTML for safe display |
 
+The entry also exports `INLINE_STYLE_BLOCK` (`src/lib/inline-style.ts`, a leaf module with a named export only, so the CommonJS entry exposes it as a plain property without loading jsdom): the default `<style>` block `mimeHtml` prepends to text-only messages. EmailEngine reuses it instead of keeping a copy.
+
 `src/lib/html-guard.ts` holds what `mimeHtml` and `inlineHtml` share before they parse anything: the nesting-depth estimate (`exceedsNestingDepth`, `MAX_NESTING_DEPTH`) and the plain-text fallback projection (`fallbackText`). It does not load jsdom, so `inline-html.ts` can import it eagerly.
 
 ### `mimeHtml`: the core, and where the complexity lives

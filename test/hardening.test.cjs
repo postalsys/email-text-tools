@@ -441,6 +441,7 @@ describe('hostile input hardening', () => {
                 "const loaded = () => Object.keys(require.cache).some(k => k.includes('/node_modules/jsdom/'));",
                 'const before = loaded();',
                 "tools.htmlToText('<p>x</p>');",
+                'tools.INLINE_STYLE_BLOCK.length;',
                 'const afterText = loaded();',
                 "const out = tools.mimeHtml({ html: '<p>x</p>' });",
                 'console.log(JSON.stringify([before, afterText, loaded(), typeof tools.mimeHtml.async, out]));'
