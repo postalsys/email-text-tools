@@ -275,7 +275,8 @@ describe('hostile input hardening', () => {
             // 10,000 rules on 10,000 paragraphs took 25 s in juice, on the calling thread
             const html = styled(rules(10000, 'p'), '<p>x</p>'.repeat(10000));
             const { result, ms } = timed(() => mimeHtml({ html }));
-            assert.ok(ms < 3000, `took ${ms} ms`);
+            // the bound only has to tell the skip from the 25 s run; 3 s failed on busy CI runners
+            assert.ok(ms < 10000, `took ${ms} ms`);
             assert.ok(result.startsWith(SKIPPED_PREFIX), result.slice(0, 80));
             assert.ok(result.includes('<p>x</p>'));
             assert.doesNotMatch(result, /color:/);
