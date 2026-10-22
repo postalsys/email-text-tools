@@ -1,6 +1,6 @@
 {
     "name": "@postalsys/email-text-tools",
-    "version": "2.6.0",
+    "version": "2.6.1",
     "description": "Email text tools",
     "type": "module",
     "main": "./dist/cjs/index.js",
