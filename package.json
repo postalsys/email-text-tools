@@ -90,10 +90,10 @@
         "globals": "17.13.0",
         "prettier": "3.9.10",
         "typescript": "6.0.3",
-        "typescript-eslint": "8.71.2"
+        "typescript-eslint": "8.72.0"
     },
     "dependencies": {
-        "@postalsys/email-content": "0.1.17",
+        "@postalsys/email-content": "0.1.18",
         "dompurify": "3.4.17",
         "he": "1.2.0",
         "html-to-text": "10.0.1",
