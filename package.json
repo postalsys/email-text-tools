@@ -93,7 +93,7 @@
         "typescript-eslint": "8.72.1"
     },
     "dependencies": {
-        "@postalsys/email-content": "0.1.18",
+        "@postalsys/email-content": "0.1.20",
         "dompurify": "3.4.17",
         "he": "1.2.0",
         "html-to-text": "10.0.1",
