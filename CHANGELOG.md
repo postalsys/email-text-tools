@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.3](https://github.com/postalsys/email-text-tools/compare/v2.6.2...v2.6.3) (2026-11-04)
+
+
+### Bug Fixes
+
+* ship jsdom 29 as a CommonJS bundle so parser fixes reach the sanitizer ([c6b5328](https://github.com/postalsys/email-text-tools/commit/c6b5328dc3c5a8af81cd232e5204e163dbc5ea5e))
+
 ## [2.6.2](https://github.com/postalsys/email-text-tools/compare/v2.6.1...v2.6.2) (2026-11-04)
 
 
