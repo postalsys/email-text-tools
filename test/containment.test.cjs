@@ -42,10 +42,12 @@ describe('container', () => {
         assert.match(out, /color: red/);
     });
 
-    it('drops a body width the CSSOM could not parse', () => {
-        // cssstyle parses nothing from this attribute, a browser reads the width
+    it('drops a body width that follows a background shorthand with a url()', () => {
+        // cssstyle 5 (jsdom 27) parsed nothing from this attribute while a browser reads the
+        // width, so the whole attribute had to go. jsdom 29 parses it and only the width goes
         const out = mimeHtml({ html: '<html><body style="background:url(https://example.com/x.gif) no-repeat; width: 5000px">x</body></html>' });
-        assert.equal(out, '<div style="overflow: auto; contain: paint;"><div>x</div></div>');
+        assert.doesNotMatch(out, /width/);
+        assert.match(out, /<div style="background: url\(&#x22;https:\/\/example\.com\/x\.gif&#x22;\) no-repeat;">x<\/div>/);
     });
 
     it('keeps body styles the CSSOM could not parse when none of them is forbidden', () => {

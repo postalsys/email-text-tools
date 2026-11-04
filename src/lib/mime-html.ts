@@ -1,5 +1,4 @@
 import createDOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
 // Pinned to juice 11.x: juice 12+ is pure ESM (requires Node >=22.12) and breaks pkg builds.
 import juice from 'juice';
 import he from 'he';
@@ -9,6 +8,7 @@ import type { WorkerPoolStats } from './worker-pool.js';
 import { MAX_NESTING_DEPTH, exceedsNestingDepth, fallbackText } from './html-guard.js';
 import { INLINE_STYLE_BLOCK } from './inline-style.js';
 import { JUICE_WORKER_PATH } from './commonjs.cjs';
+import { JSDOM } from './jsdom.cjs';
 
 import textToHtml from './text-to-html.js';
 

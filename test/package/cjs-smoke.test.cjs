@@ -88,3 +88,34 @@ describe('CommonJS build', () => {
         assert.match(tools.textToHtml('see example.photography'), /<a href="http:\/\/example\.photography">/);
     });
 });
+
+// jsdom pulls in ES module only packages, so it ships as the CommonJS bundle that
+// scripts/bundle-jsdom.js builds, and the package itself must never be a runtime dependency
+describe('bundled jsdom', () => {
+    const manifest = require(path.join(root, 'package.json'));
+    const vendor = path.join(root, 'dist', 'vendor');
+
+    it('is not a runtime dependency', () => {
+        assert.ok(!('jsdom' in (manifest.dependencies || {})));
+        assert.ok('jsdom' in manifest.devDependencies);
+    });
+
+    it('loads from dist/vendor, the version the package was built with', () => {
+        tools.mimeHtml({ html: '<p>x</p>' });
+        assert.ok(Object.keys(require.cache).includes(path.join(vendor, 'jsdom.cjs')));
+        assert.ok(!Object.keys(require.cache).some(file => file.includes(`${path.sep}node_modules${path.sep}jsdom${path.sep}`)));
+        const packages = require(path.join(vendor, 'jsdom.packages.json'));
+        const jsdom = packages.find(entry => entry.name === 'jsdom');
+        assert.equal(jsdom.version, require('jsdom/package.json').version);
+        assert.ok(packages.some(entry => entry.name === 'parse5'));
+        for (const entry of packages) {
+            assert.ok(entry.license, `${entry.name} declares a license`);
+        }
+    });
+
+    it('serves computed styles from the inlined default stylesheet', () => {
+        const { JSDOM } = require(path.join(vendor, 'jsdom.cjs'));
+        const { window } = new JSDOM('<p>x</p>');
+        assert.equal(window.getComputedStyle(window.document.querySelector('p')).display, 'block');
+    });
+});

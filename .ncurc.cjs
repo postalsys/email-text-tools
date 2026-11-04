@@ -5,7 +5,6 @@ module.exports = {
     reject: [
         // Block package upgrades that moved to ESM
         'nanoid',
-        'jsdom', // parse5 dependency in 27.0.1 is ESM only
         'juice', // 12+ is pure ESM (requires Node >=22.12) and breaks pkg builds
         // node-html-parser was rejected here on the grounds that 8+ depends on the pure-ESM entities@8.
         // That is not how it ships: node-html-parser 9 bundles entities inline into dist/index.cjs and
@@ -20,13 +19,8 @@ module.exports = {
         // and pkg cannot bundle it. 1.2.0 is the last CommonJS release; EmailEngine and mailparser
         // hold it there too, and a different copy here would be a second he in their trees
         'he',
-        // @asamuzakjp/css-color >=4.1.2 pulls in @csstools/* which are pure ESM, so require(jsdom) fails
-        // without require(esm) (jsdom -> cssstyle -> @asamuzakjp/css-color). Held at 4.1.1 through
-        // package.json "overrides"; overrides do not propagate to consumers, EmailEngine carries its own.
-        '@asamuzakjp/css-color',
         // Type declarations follow the runtime package they describe, which is held above
         '@types/he',
-        '@types/jsdom',
         '@types/linkify-it'
     ],
     target: name => {
@@ -37,6 +31,12 @@ module.exports = {
         }
         // typescript-eslint declares a peer range that excludes TypeScript 7
         if (name === 'typescript') {
+            return 'minor';
+        }
+        // jsdom ships as a CommonJS bundle built by scripts/bundle-jsdom.js, so its ES module only
+        // dependencies no longer hold it back. 30.x requires Node >=22.22 and the bundle runs on the
+        // Node 20 floor, so it stays on 29.x; its type declarations follow (28.x is the newest below 30)
+        if (name === 'jsdom' || name === '@types/jsdom') {
             return 'minor';
         }
         return 'latest';

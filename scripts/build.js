@@ -14,12 +14,16 @@
 // src/lib/commonjs.cts compiles to a .cjs file in both builds: it holds what an ES
 // module can not do the same way in both formats (the directory of the worker script,
 // a require() of the JSON-only tlds package).
+//
+// 4. Bundles jsdom into dist/vendor/jsdom.cjs (scripts/bundle-jsdom.js), which both builds load
+//    through src/lib/jsdom.cts.
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { bundleJsdom } from './bundle-jsdom.js';
 
 const require = createRequire(import.meta.url);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -73,7 +77,7 @@ function applyCjsInterop(dir) {
     }
 }
 
-function build() {
+async function build() {
     fs.rmSync(path.join(root, 'dist'), { recursive: true, force: true });
 
     runTsc('tsconfig.esm.json');
@@ -89,6 +93,8 @@ function build() {
     fs.rmSync(path.join(cjs, 'index.d.cts'));
 
     applyCjsInterop(cjs);
+
+    await bundleJsdom(root);
 }
 
-build();
+await build();

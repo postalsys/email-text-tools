@@ -439,7 +439,7 @@ describe('hostile input hardening', () => {
             // A fresh process, since this test process has already loaded jsdom
             const script = [
                 "const tools = require('.');",
-                "const loaded = () => Object.keys(require.cache).some(k => k.includes('/node_modules/jsdom/'));",
+                "const loaded = () => Object.keys(require.cache).some(k => k.endsWith('/dist/vendor/jsdom.cjs'));",
                 'const before = loaded();',
                 "tools.htmlToText('<p>x</p>');",
                 'tools.INLINE_STYLE_BLOCK.length;',
@@ -477,13 +477,13 @@ describe('forbidden style properties behind CSS escapes', () => {
 });
 
 describe('forbidden style properties the CSSOM could not parse', () => {
-    it('drops a style attribute cssstyle rejected that names a forbidden property', () => {
-        // cssstyle 5 parses nothing from an attribute whose background shorthand with a url() is
-        // followed by more declarations, so the raw text went out verbatim and a browser, which
-        // parses it fine, honored the position
+    it('removes a forbidden property after a background shorthand with a url()', () => {
+        // cssstyle 5 (jsdom 27) parsed nothing from this attribute, so the raw text went out
+        // verbatim and a browser, which parses it fine, honored the position. The attribute was
+        // dropped whole for that reason. jsdom 29 parses it, so only the forbidden property goes
         const out = mimeHtml({ html: '<div style="background:url(https://example.com/x.gif) no-repeat; position:fixed; top:0">x</div>' });
-        assert.ok(!/position|fixed|top:/i.test(out), out);
-        assert.ok(out.includes('<div>x</div>'), out);
+        assert.ok(!/position|fixed/i.test(out), out);
+        assert.match(out, /background: url\(/);
     });
 
     it('keeps the declarations the CSSOM parsed around one it could not', () => {

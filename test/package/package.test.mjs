@@ -108,7 +108,11 @@ describe('Packed package', () => {
                 assert.ok(files.includes(`dist/${format}/${name}.d.ts`), `dist/${format}/${name}.d.ts is packed`);
             }
             assert.ok(files.includes(`dist/${format}/lib/commonjs.cjs`));
+            assert.ok(files.includes(`dist/${format}/lib/jsdom.cjs`));
             assert.ok(files.includes(`dist/${format}/package.json`));
+        }
+        for (const name of ['jsdom.cjs', 'jsdom.LICENSES.txt', 'jsdom.packages.json']) {
+            assert.ok(files.includes(`dist/vendor/${name}`), `dist/vendor/${name} is packed`);
         }
         for (const file of files) {
             assert.ok(!/^(src|test|scripts|benchmark|examples|docs)\//.test(file), `${file} must not be packed`);
