@@ -136,9 +136,17 @@ const STYLE_TAG = /<style[\s/>]/i;
 // were removed when the body was the outermost element, which consumers may rely on.
 const BODY_STYLES_RULE = styleRule(['width', 'min-width', 'max-width', 'height', 'min-height', 'max-height'], /width|height/i);
 
-// One sanitizer for the module. Every sanitize() call passes its full config, so calls do not
-// leak settings into each other.
-const DOMPurify = createDOMPurify(new JSDOM('').window);
+// A fresh window per sanitize. RETURN_DOM leaves the document on the window it was parsed in, so
+// one window for the process keeps every message. The string is copied out before the window is
+// closed. Every call still passes its full config, so settings do not carry from one to the next.
+function withDomPurify<T>(run: (domPurify: ReturnType<typeof createDOMPurify>) => T): T {
+    const jsdom = new JSDOM('');
+    try {
+        return run(createDOMPurify(jsdom.window));
+    } finally {
+        jsdom.window.close();
+    }
+}
 
 // Global worker pool instance (lazy initialization)
 let globalWorkerPool: WorkerPool | null = null;
@@ -344,49 +352,51 @@ function prepareHtml(message: MimeHtmlMessage): { html: string; hasStyle: boolea
     }
 
     // first pass, returns the <html> element of the fixed HTML page
-    const root = DOMPurify.sanitize(html, {
-        WHOLE_DOCUMENT: true,
-        FORCE_BODY: false,
-        USE_PROFILES,
-        FORBID_TAGS,
-        FORBID_ATTR,
-        RETURN_DOM: true
-    }) as HTMLElement;
+    return withDomPurify(domPurify => {
+        const root = domPurify.sanitize(html, {
+            WHOLE_DOCUMENT: true,
+            FORCE_BODY: false,
+            USE_PROFILES,
+            FORBID_TAGS,
+            FORBID_ATTR,
+            RETURN_DOM: true
+        }) as HTMLElement;
 
-    // Remove any style tags from within body content
-    const body = root.querySelector('body');
-    const bodyStyleTags = body ? body.querySelectorAll('style') : [];
-    bodyStyleTags.forEach(tag => tag.remove());
+        // Remove any style tags from within body content
+        const body = root.querySelector('body');
+        const bodyStyleTags = body ? body.querySelectorAll('style') : [];
+        bodyStyleTags.forEach(tag => tag.remove());
 
-    // Process remaining style tags to remove known problematic selectors
-    let styleBudget = MAX_STYLE_TEXT;
-    let hasStyle = false;
-    let selectors = 0;
-    root.querySelectorAll('style').forEach(styleTag => {
-        let cssContent = styleTag.textContent || '';
-        if (cssContent.length > styleBudget) {
-            // cut after the last complete rule, a partial rule would skip the selector filter
-            cssContent = styleBudget > 0 ? cssContent.substring(0, cssContent.lastIndexOf('}', styleBudget - 1) + 1) : '';
+        // Process remaining style tags to remove known problematic selectors
+        let styleBudget = MAX_STYLE_TEXT;
+        let hasStyle = false;
+        let selectors = 0;
+        root.querySelectorAll('style').forEach(styleTag => {
+            let cssContent = styleTag.textContent || '';
+            if (cssContent.length > styleBudget) {
+                // cut after the last complete rule, a partial rule would skip the selector filter
+                cssContent = styleBudget > 0 ? cssContent.substring(0, cssContent.lastIndexOf('}', styleBudget - 1) + 1) : '';
+            }
+            styleBudget -= cssContent.length;
+            cssContent = filterCss(cssContent);
+            styleTag.textContent = cssContent;
+            if (cssContent.trim()) {
+                hasStyle = true;
+                selectors += countSelectors(cssContent);
+            }
+        });
+
+        let inliningSkipped = false;
+        if (hasStyle) {
+            const elements = root.getElementsByTagName('*').length;
+            if (selectors > MAX_INLINE_SELECTORS || elements > MAX_INLINE_ELEMENTS || selectors * elements > MAX_INLINE_WORK) {
+                hasStyle = false;
+                inliningSkipped = true;
+            }
         }
-        styleBudget -= cssContent.length;
-        cssContent = filterCss(cssContent);
-        styleTag.textContent = cssContent;
-        if (cssContent.trim()) {
-            hasStyle = true;
-            selectors += countSelectors(cssContent);
-        }
+
+        return { html: root.outerHTML, hasStyle, inliningSkipped };
     });
-
-    let inliningSkipped = false;
-    if (hasStyle) {
-        const elements = root.getElementsByTagName('*').length;
-        if (selectors > MAX_INLINE_SELECTORS || elements > MAX_INLINE_ELEMENTS || selectors * elements > MAX_INLINE_WORK) {
-            hasStyle = false;
-            inliningSkipped = true;
-        }
-    }
-
-    return { html: root.outerHTML, hasStyle, inliningSkipped };
 }
 
 // Removes the properties of a style rule from an element the way a browser will read them, by the
@@ -420,54 +430,56 @@ function removeStyleProperties(node: HTMLElement, rule: StyleRule): void {
 // The sanitization pass that produces the output (the second one when there was a stylesheet to
 // inline, the only one otherwise) and the post-processing of its result.
 function finishHtml(html: string, inliningSkipped: boolean): string {
-    // outputs a BODY DOM element
-    const dom = DOMPurify.sanitize(html, {
-        RETURN_DOM: true,
-        WHOLE_DOCUMENT: false,
-        FORCE_BODY: true,
-        USE_PROFILES,
-        FORBID_TAGS: FORBID_TAGS_ALL,
-        FORBID_ATTR
-    }) as HTMLElement;
+    return withDomPurify(domPurify => {
+        // outputs a BODY DOM element
+        const dom = domPurify.sanitize(html, {
+            RETURN_DOM: true,
+            WHOLE_DOCUMENT: false,
+            FORCE_BODY: true,
+            USE_PROFILES,
+            FORBID_TAGS: FORBID_TAGS_ALL,
+            FORBID_ATTR
+        }) as HTMLElement;
 
-    // Every link opens a new browsing context that gets neither an opener nor a referrer. Browsers
-    // imply noopener for target="_blank", but rel="opener" opts back in and the sender writes rel,
-    // and an opener can navigate the page the message is shown in. An <area> is a link too.
-    for (const link of dom.querySelectorAll('a, area')) {
-        link.setAttribute('target', '_blank');
-        link.setAttribute('rel', 'noopener noreferrer');
-    }
-
-    // remove specific style properties, touching the CSSOM only where the style text could name one
-    for (const node of [dom, ...dom.querySelectorAll<HTMLElement>('[style]')]) {
-        if (!node.style) {
-            continue;
+        // Every link opens a new browsing context that gets neither an opener nor a referrer. Browsers
+        // imply noopener for target="_blank", but rel="opener" opts back in and the sender writes rel,
+        // and an opener can navigate the page the message is shown in. An <area> is a link too.
+        for (const link of dom.querySelectorAll('a, area')) {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
         }
-        const styleText = node.getAttribute('style') || '';
-        if (styleText.indexOf('\\') >= 0) {
-            // A browser resolves CSS escapes in property names (p\osition is position) but jsdom's
-            // CSSOM does not, so the checks below would miss them. Decode first and write the
-            // decoded text back so the CSSOM sees the same properties the browser will
-            node.setAttribute('style', decodeCssEscapes(styleText));
+
+        // remove specific style properties, touching the CSSOM only where the style text could name one
+        for (const node of [dom, ...dom.querySelectorAll<HTMLElement>('[style]')]) {
+            if (!node.style) {
+                continue;
+            }
+            const styleText = node.getAttribute('style') || '';
+            if (styleText.indexOf('\\') >= 0) {
+                // A browser resolves CSS escapes in property names (p\osition is position) but jsdom's
+                // CSSOM does not, so the checks below would miss them. Decode first and write the
+                // decoded text back so the CSSOM sees the same properties the browser will
+                node.setAttribute('style', decodeCssEscapes(styleText));
+            }
+            removeStyleProperties(node, FORBID_STYLES_RULE);
         }
-        removeStyleProperties(node, FORBID_STYLES_RULE);
-    }
-    removeStyleProperties(dom, BODY_STYLES_RULE);
+        removeStyleProperties(dom, BODY_STYLES_RULE);
 
-    const bodyStyles = (dom.getAttribute('style') || '').trim();
+        const bodyStyles = (dom.getAttribute('style') || '').trim();
 
-    // Two wrappers. The outer one is ours alone and clips everything inside it; the inner one is
-    // the message body with the styles it came with. While the body's styles sat on the clipping
-    // element, a sender could undo the clipping (display: contents or inline, an overflow-x:
-    // visible written after our overflow) or move the element itself over the page around it (a
-    // negative margin, a box-shadow or an outline a few thousand pixels wide). Position is the
-    // one property that escapes an overflow clip, and it is forbidden above; paint containment
-    // makes the outer box the containing block of a fixed or absolute descendant as well, so a
-    // position that slipped past the filter would still be clipped by it. The attribute tells
-    // the caller the CSS inlining caps were hit
-    const marker = inliningSkipped ? ' data-css-inlining="skipped"' : '';
-    const body = bodyStyles ? `<div style="${he.encode(bodyStyles)}">` : '<div>';
-    return `<div style="overflow: auto; contain: paint;"${marker}>${body}${dom.innerHTML.trim()}</div></div>`;
+        // Two wrappers. The outer one is ours alone and clips everything inside it; the inner one is
+        // the message body with the styles it came with. While the body's styles sat on the clipping
+        // element, a sender could undo the clipping (display: contents or inline, an overflow-x:
+        // visible written after our overflow) or move the element itself over the page around it (a
+        // negative margin, a box-shadow or an outline a few thousand pixels wide). Position is the
+        // one property that escapes an overflow clip, and it is forbidden above; paint containment
+        // makes the outer box the containing block of a fixed or absolute descendant as well, so a
+        // position that slipped past the filter would still be clipped by it. The attribute tells
+        // the caller the CSS inlining caps were hit
+        const marker = inliningSkipped ? ' data-css-inlining="skipped"' : '';
+        const body = bodyStyles ? `<div style="${he.encode(bodyStyles)}">` : '<div>';
+        return `<div style="overflow: auto; contain: paint;"${marker}>${body}${dom.innerHTML.trim()}</div></div>`;
+    });
 }
 
 // Runs the pipeline and renders the plain text fallback when it fails, for example when a
