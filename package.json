@@ -103,5 +103,8 @@
         "linkify-it": "5.0.2",
         "node-html-parser": "9.0.7",
         "tlds": "1.261.0"
+    },
+    "overrides": {
+        "minimatch": "11.0.8"
     }
 }
