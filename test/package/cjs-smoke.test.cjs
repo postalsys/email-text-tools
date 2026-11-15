@@ -89,33 +89,48 @@ describe('CommonJS build', () => {
     });
 });
 
-// jsdom pulls in ES module only packages, so it ships as the CommonJS bundle that
-// scripts/bundle-jsdom.js builds, and the package itself must never be a runtime dependency
-describe('bundled jsdom', () => {
-    const manifest = require(path.join(root, 'package.json'));
+// jsdom and juice pull in ES module only packages, so they ship as the CommonJS bundles that
+// scripts/bundle-vendor.js builds, and the packages themselves must never be runtime dependencies
+for (const name of ['jsdom', 'juice']) {
+    describe(`bundled ${name}`, () => {
+        const manifest = require(path.join(root, 'package.json'));
+        const vendor = path.join(root, 'dist', 'vendor');
+
+        it('is not a runtime dependency', () => {
+            assert.ok(!(name in (manifest.dependencies || {})));
+            assert.ok(name in manifest.devDependencies);
+        });
+
+        it('loads from dist/vendor, the version the package was built with', () => {
+            tools.mimeHtml({ html: '<style>p { color: red; }</style><p>x</p>' });
+            assert.ok(Object.keys(require.cache).includes(path.join(vendor, `${name}.cjs`)));
+            assert.ok(!Object.keys(require.cache).some(file => file.includes(`${path.sep}node_modules${path.sep}${name}${path.sep}`)));
+            const packages = require(path.join(vendor, `${name}.packages.json`));
+            assert.equal(packages.find(entry => entry.name === name).version, require(`${name}/package.json`).version);
+            for (const entry of packages) {
+                assert.ok(entry.license, `${entry.name} declares a license`);
+            }
+        });
+    });
+}
+
+describe('bundled packages at work', () => {
     const vendor = path.join(root, 'dist', 'vendor');
 
-    it('is not a runtime dependency', () => {
-        assert.ok(!('jsdom' in (manifest.dependencies || {})));
-        assert.ok('jsdom' in manifest.devDependencies);
-    });
-
-    it('loads from dist/vendor, the version the package was built with', () => {
-        tools.mimeHtml({ html: '<p>x</p>' });
-        assert.ok(Object.keys(require.cache).includes(path.join(vendor, 'jsdom.cjs')));
-        assert.ok(!Object.keys(require.cache).some(file => file.includes(`${path.sep}node_modules${path.sep}jsdom${path.sep}`)));
-        const packages = require(path.join(vendor, 'jsdom.packages.json'));
-        const jsdom = packages.find(entry => entry.name === 'jsdom');
-        assert.equal(jsdom.version, require('jsdom/package.json').version);
-        assert.ok(packages.some(entry => entry.name === 'parse5'));
-        for (const entry of packages) {
-            assert.ok(entry.license, `${entry.name} declares a license`);
-        }
-    });
-
-    it('serves computed styles from the inlined default stylesheet', () => {
+    it('jsdom carries its parser and serves computed styles from its default stylesheet', () => {
+        assert.ok(require(path.join(vendor, 'jsdom.packages.json')).some(entry => entry.name === 'parse5'));
         const { JSDOM } = require(path.join(vendor, 'jsdom.cjs'));
         const { window } = new JSDOM('<p>x</p>');
         assert.equal(window.getComputedStyle(window.document.querySelector('p')).display, 'block');
+    });
+
+    it('juice inlines a stylesheet', () => {
+        const juice = require(path.join(vendor, 'juice.cjs'));
+        assert.match(juice('<style>p { color: red; }</style><p>x</p>'), /<p style="color: red;">x<\/p>/);
+    });
+
+    it('juice does not parse selectors with slick', () => {
+        // slick caches every selector it has seen for the life of the process, see test/memory.test.cjs
+        assert.ok(!require(path.join(vendor, 'juice.packages.json')).some(entry => entry.name === 'slick'));
     });
 });

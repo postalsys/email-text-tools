@@ -73,7 +73,7 @@
     "author": "Postal Systems OÜ",
     "license": "MIT",
     "engines": {
-        "node": ">=20.19.0"
+        "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
     },
     "bugs": {
         "url": "https://github.com/postalsys/email-text-tools/issues"
@@ -82,24 +82,24 @@
     "devDependencies": {
         "@types/he": "1.2.3",
         "@types/html-to-text": "9.0.4",
-        "@types/jsdom": "28.0.3",
+        "@types/jsdom": "30.0.0",
         "@types/linkify-it": "5.0.0",
-        "@types/node": "20.19.43",
+        "@types/node": "22.20.5",
         "esbuild": "0.28.2",
-        "eslint": "10.14.0",
+        "eslint": "10.15.0",
         "eslint-config-prettier": "10.1.8",
         "globals": "17.14.0",
-        "jsdom": "29.1.1",
-        "prettier": "3.9.10",
+        "jsdom": "31.0.1",
+        "juice": "12.2.3",
+        "prettier": "3.10.1",
         "typescript": "6.0.3",
         "typescript-eslint": "8.72.2"
     },
     "dependencies": {
         "@postalsys/email-content": "0.1.21",
-        "dompurify": "3.4.17",
+        "dompurify": "3.4.18",
         "he": "1.2.0",
         "html-to-text": "10.0.1",
-        "juice": "11.1.1",
         "linkify-it": "5.0.2",
         "node-html-parser": "9.0.7",
         "tlds": "1.261.0"

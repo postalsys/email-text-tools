@@ -15,7 +15,7 @@ jobs:
     test:
         strategy:
             matrix:
-                node: [20.x, 22.x, 24.x, latest]
+                node: [22.x, 24.x, latest]
                 os: [ubuntu-latest]
         runs-on: ${{ matrix.os }}
         timeout-minutes: 10
@@ -31,5 +31,4 @@ jobs:
             - run: npm run format:check
             - run: npm test
             - name: CommonJS dependency graph (require(esm) disabled)
-              if: matrix.node != '20.x'
               run: npm run test:cjs

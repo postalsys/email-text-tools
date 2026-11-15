@@ -109,9 +109,10 @@ describe('Packed package', () => {
             }
             assert.ok(files.includes(`dist/${format}/lib/commonjs.cjs`));
             assert.ok(files.includes(`dist/${format}/lib/jsdom.cjs`));
+            assert.ok(files.includes(`dist/${format}/lib/juice.cjs`));
             assert.ok(files.includes(`dist/${format}/package.json`));
         }
-        for (const name of ['jsdom.cjs', 'jsdom.LICENSES.txt', 'jsdom.packages.json']) {
+        for (const name of ['jsdom', 'juice'].flatMap(bundle => [`${bundle}.cjs`, `${bundle}.LICENSES.txt`, `${bundle}.packages.json`])) {
             assert.ok(files.includes(`dist/vendor/${name}`), `dist/vendor/${name} is packed`);
         }
         for (const file of files) {

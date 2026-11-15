@@ -1,6 +1,6 @@
 import createDOMPurify from 'dompurify';
-// Pinned to juice 11.x: juice 12+ is pure ESM (requires Node >=22.12) and breaks pkg builds.
-import juice from 'juice';
+// juice comes from the CommonJS bundle in dist/vendor, see juice.cts
+import { juice } from './juice.cjs';
 import he from 'he';
 import { Worker } from 'node:worker_threads';
 import WorkerPool from './worker-pool.js';
@@ -62,8 +62,8 @@ const FORBID_TAGS = [
 // form submission targets and popovers, which let sender markup act on or overlay the viewer
 const FORBID_ATTR = ['action', 'formaction', 'popover', 'popovertarget'];
 
+// `all` is forbidden too, but whole attributes at a time, see ALL_RULE
 const FORBID_STYLES = [
-    'all',
     'position',
     'clip',
     'animation',
@@ -92,18 +92,28 @@ const FORBID_STYLES = [
 
 // Properties to remove from style attributes: the list, a cheap test for style text that could
 // name one of them, and a test for one of them in declaration position (at the start, or after any
-// character that cannot be part of a longer property name, so "background-position" is not one)
+// character that cannot be part of a longer property name, so "background-position" is not one,
+// and followed by the colon, with any whitespace or comments in between as CSS allows)
 interface StyleRule {
     properties: string[];
     hint: RegExp;
     declaration: RegExp;
 }
 
+// A CSS comment, written so that a run of them can only be split one way (no backtracking blowup)
+const CSS_COMMENT = '/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/';
+
 function styleRule(properties: string[], hint: RegExp): StyleRule {
-    return { properties, hint, declaration: new RegExp('(?:^|[^a-z0-9-])(?:' + properties.join('|') + ')\\s*:', 'i') };
+    return { properties, hint, declaration: new RegExp(`(?:^|[^a-z0-9-])(?:${properties.join('|')})\\s*(?:${CSS_COMMENT}\\s*)*:`, 'i') };
 }
 
-const FORBID_STYLES_RULE = styleRule(FORBID_STYLES, /position|float|clip|zoom|anim|offset|scrollbar|paint|clear|\ball\b/i);
+const FORBID_STYLES_RULE = styleRule(FORBID_STYLES, /position|float|clip|zoom|anim|offset|scrollbar|paint|clear/i);
+
+// The `all` property resets every other one. jsdom 30+ reads it as the shorthand of every longhand
+// (over five hundred of them), so a declared one would serialize as all of them the moment the
+// attribute is written back from the CSSOM: a few bytes of input per element would become kilobytes
+// of output. An element that declares it loses its style attribute instead, see finishHtml()
+const ALL_RULE = styleRule(['all'], /\ball\b/i);
 
 // Resolves CSS escape sequences (\6F, \o) the way a browser does before it matches a property
 // name, so that a forbidden property cannot hide behind an escaped character
@@ -396,7 +406,11 @@ function removeStyleProperties(node: HTMLElement, rule: StyleRule): void {
         return;
     }
     for (const property of rule.properties) {
-        node.style.removeProperty(property);
+        // Only what the element holds: removing a shorthand removes its longhands too, and with a
+        // shorthand like `all` (see ALL_RULE) that would be the whole declaration block
+        if (node.style.getPropertyValue(property)) {
+            node.style.removeProperty(property);
+        }
     }
     // removeProperty() rewrites the attribute from the CSSOM, which only holds the declarations
     // cssstyle managed to parse. A forbidden property still named in the attribute after that was
@@ -443,12 +457,19 @@ function finishHtml(html: string, inliningSkipped: boolean): string {
         if (!node.style) {
             continue;
         }
-        const styleText = node.getAttribute('style') || '';
+        let styleText = node.getAttribute('style') || '';
         if (styleText.indexOf('\\') >= 0) {
             // A browser resolves CSS escapes in property names (p\osition is position) but jsdom's
             // CSSOM does not, so the checks below would miss them. Decode first and write the
             // decoded text back so the CSSOM sees the same properties the browser will
-            node.setAttribute('style', decodeCssEscapes(styleText));
+            styleText = decodeCssEscapes(styleText);
+            node.setAttribute('style', styleText);
+        }
+        if (ALL_RULE.hint.test(styleText) && ALL_RULE.declaration.test(styleText)) {
+            // A browser would still apply the declarations that follow an `all`, so they are lost
+            // too: the price of never writing the expanded block back, see ALL_RULE
+            node.removeAttribute('style');
+            continue;
         }
         removeStyleProperties(node, FORBID_STYLES_RULE);
     }

@@ -498,6 +498,45 @@ describe('forbidden style properties the CSSOM could not parse', () => {
         assert.ok(out.includes('style="background:url(clear.gif); color:red"'), out);
     });
 
+    it('leaves the declarations alone when the forbidden all property is not declared', () => {
+        // jsdom 30+ reads all as the shorthand of every property, so removing an undeclared one
+        // used to clear the whole attribute
+        const out = mimeHtml({ html: '<div style="color: red; float: left; margin: 0 auto">x</div>' });
+        assert.ok(!/float/i.test(out), out);
+        assert.match(out, /color: red/);
+        assert.match(out, /margin: 0(px)? auto/);
+    });
+
+    it('drops an attribute that declares all', () => {
+        for (const style of [
+            'all: unset; color: red',
+            'color: red; ALL:revert',
+            'color:red;}all:initial',
+            'a\\ll: unset',
+            'all/**/: unset',
+            'color: red; /* a */ all /* b */ : unset'
+        ]) {
+            const out = mimeHtml({ html: `<div style="${style}">x</div>` });
+            assert.equal(out, '<div style="overflow: auto; contain: paint;"><div><div>x</div></div></div>', style);
+        }
+    });
+
+    it('matches declarations behind comments in linear time', () => {
+        for (const style of ['all' + '/**/'.repeat(20000) + ' unset', 'all/*' + '*'.repeat(50000), 'all' + ' /* x */'.repeat(10000)]) {
+            const { ms } = timed(() => mimeHtml({ html: `<div style="${style}">x</div>` }));
+            assert.ok(ms < 1000, `${style.slice(0, 20)}: ${ms} ms`);
+        }
+    });
+
+    it('does not expand a declared all into every longhand', () => {
+        // jsdom 30+ expands all into over five hundred longhands, which a write of the attribute
+        // from the CSSOM would serialize: a few bytes per element became kilobytes
+        const html = '<div style="all: unset; position: fixed; color: red">x</div>'.repeat(200);
+        const out = mimeHtml({ html });
+        assert.ok(out.length < html.length, `${html.length} bytes in, ${out.length} out`);
+        assert.ok(!/unset|position/.test(out), out.slice(0, 500));
+    });
+
     it('does not take a longer property name for a forbidden one', () => {
         const out = mimeHtml({ html: '<div style="background-position: center top; text-underline-offset: 2px; color:red">x</div>' });
         assert.ok(out.includes('background-position: center top'), out);

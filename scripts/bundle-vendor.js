@@ -1,49 +1,57 @@
-// Bundles jsdom and everything it loads into one CommonJS file, dist/vendor/jsdom.cjs.
+// Bundles jsdom and juice, each with everything it loads, into one CommonJS file apiece:
+// dist/vendor/jsdom.cjs and dist/vendor/juice.cjs.
 //
 // jsdom is what DOMPurify sanitizes on, so its HTML parser (parse5) decides how hostile markup is
-// read before it is cleaned. From 27.0.1 jsdom depends on an ES module only parse5, and later
-// releases pull in more ES module only packages (@asamuzakjp/*, @exodus/bytes, tough-cookie).
-// The CommonJS build has to stay loadable without require(esm), because EmailEngine bundles it
-// into a binary with @yao-pkg/pkg, which cannot load ES modules. Rather than holding jsdom on
-// 27.0.0 forever, the build turns it into real CommonJS here, so parser fixes keep arriving.
+// read before it is cleaned, and juice inlines the stylesheets of a message. Both are ES module
+// only (jsdom through parse5, @asamuzakjp/*, @exodus/bytes and tough-cookie, juice 12 itself). The
+// CommonJS build has to stay loadable without require(esm), because EmailEngine bundles it into a
+// binary with @yao-pkg/pkg, which cannot load ES modules. Rather than holding either on its last
+// CommonJS release, the build turns them into real CommonJS here, so fixes keep arriving.
 //
-// jsdom is a devDependency for that reason: nothing at runtime resolves the package itself.
+// Both are devDependencies for that reason: nothing at runtime resolves the packages themselves.
 //
-// Two jsdom internals do not survive bundling and are patched in place. The build fails when a
+// juice is bundled through its `juice/client` entry, the juice() function without the file and URL
+// inlining helpers (web-resource-inliner), which this library never calls.
+//
+// One jsdom internal does not survive bundling and is patched in place. The build fails when a
 // patch did not apply, whether its pattern stopped matching or its file moved, rather than
 // shipping a bundle that breaks at runtime:
-// - the default stylesheet is read from a path relative to __dirname, so it is inlined
 // - the synchronous XMLHttpRequest worker is located with require.resolve() at load time. This
 //   library never runs scripts or loads resources, so the path is replaced with null.
 //
-// The licenses of every bundled package are written to dist/vendor/jsdom.LICENSES.txt and the
-// package list to dist/vendor/jsdom.packages.json, so a consumer's license listing can name them.
+// The licenses of every bundled package are written to dist/vendor/<name>.LICENSES.txt and the
+// package list to dist/vendor/<name>.packages.json, so a consumer's license listing can name them.
 
 import * as esbuild from 'esbuild';
 import fs from 'node:fs';
-import { createRequire } from 'node:module';
 import path from 'node:path';
-
-const require = createRequire(import.meta.url);
 
 const SEPARATOR = '\n\n' + '-'.repeat(72) + '\n\n';
 
-const PATCHES = [
+const BUNDLES = [
     {
-        file: /jsdom[\\/]lib[\\/]jsdom[\\/]living[\\/]css[\\/]helpers[\\/]computed-style\.js$/,
-        pattern: /fs\.readFileSync\(\s*path\.resolve\(__dirname, "\.\.\/\.\.\/\.\.\/browser\/default-stylesheet\.css"\),\s*\{\s*encoding: "utf-8"\s*\}\s*\)/,
-        replacement: jsdomDir => JSON.stringify(fs.readFileSync(path.join(jsdomDir, 'lib', 'jsdom', 'browser', 'default-stylesheet.css'), 'utf8'))
+        name: 'jsdom',
+        entry: "module.exports = require('jsdom');",
+        // canvas is an optional native peer that jsdom loads inside a try/catch; it is never installed
+        external: ['canvas'],
+        patches: [
+            {
+                file: /jsdom[\\/]lib[\\/]jsdom[\\/]living[\\/]xhr[\\/]XMLHttpRequest-impl\.js$/,
+                pattern: /require\.resolve\("\.\/xhr-sync-worker\.js"\)/,
+                replacement: 'null'
+            }
+        ]
     },
     {
-        file: /jsdom[\\/]lib[\\/]jsdom[\\/]living[\\/]xhr[\\/]XMLHttpRequest-impl\.js$/,
-        pattern: /require\.resolve\("\.\/xhr-sync-worker\.js"\)/,
-        replacement: () => 'null'
+        name: 'juice',
+        // juice/client is an ES module, its default export is the juice() function
+        entry: "module.exports = require('juice/client').default;"
     }
 ];
 
-function jsdomPatches(jsdomDir, applied) {
+function vendorPatches(bundle, applied) {
     return {
-        name: 'jsdom-patches',
+        name: `${bundle.name}-patches`,
         setup(build) {
             // Prefer a package's own CommonJS build where it ships one. An ES module build that loads
             // its data through createRequire(import.meta.url) (css-tree does) cannot work from inside
@@ -61,15 +69,17 @@ function jsdomPatches(jsdomDir, applied) {
                 return resolved.errors.length ? undefined : resolved;
             });
 
-            for (const patch of PATCHES) {
+            for (const patch of bundle.patches || []) {
                 build.onLoad({ filter: patch.file }, args => {
                     const source = fs.readFileSync(args.path, 'utf8');
                     const matches = source.match(new RegExp(patch.pattern.source, 'g')) || [];
                     if (matches.length !== 1) {
-                        throw new Error(`jsdom bundle: ${path.basename(args.path)} matches ${patch.pattern} ${matches.length} times, update the patch`);
+                        throw new Error(
+                            `${bundle.name} bundle: ${path.basename(args.path)} matches ${patch.pattern} ${matches.length} times, update the patch`
+                        );
                     }
                     applied.add(patch);
-                    return { contents: source.replace(patch.pattern, () => patch.replacement(jsdomDir)), loader: 'js' };
+                    return { contents: source.replace(patch.pattern, () => patch.replacement), loader: 'js' };
                 });
             }
         }
@@ -92,7 +102,7 @@ function readLicenseText(dir) {
     return file ? fs.readFileSync(path.join(dir, file), 'utf8').trim() : null;
 }
 
-function writeLicenses(root, metafile, outDir) {
+function writeLicenses(root, name, metafile, outDir) {
     const packages = new Map();
     for (const input of Object.keys(metafile.inputs)) {
         const dir = packageDirOf(input);
@@ -111,11 +121,11 @@ function writeLicenses(root, metafile, outDir) {
     const list = [...packages.values()].sort((a, b) => a.name.localeCompare(b.name) || a.version.localeCompare(b.version));
     const missing = list.filter(entry => !entry.license);
     if (missing.length) {
-        throw new Error(`jsdom bundle: no license declared by ${missing.map(entry => entry.name).join(', ')}`);
+        throw new Error(`${name} bundle: no license declared by ${missing.map(entry => entry.name).join(', ')}`);
     }
 
     fs.writeFileSync(
-        path.join(outDir, 'jsdom.packages.json'),
+        path.join(outDir, `${name}.packages.json`),
         JSON.stringify(
             list.map(({ name, version, license }) => ({ name, version, license })),
             null,
@@ -126,26 +136,21 @@ function writeLicenses(root, metafile, outDir) {
     const text = list
         .map(entry => [`${entry.name}@${entry.version} (${entry.license})`, entry.licenseText || `Licensed under ${entry.license}.`].join('\n\n'))
         .join(SEPARATOR);
-    fs.writeFileSync(path.join(outDir, 'jsdom.LICENSES.txt'), 'dist/vendor/jsdom.cjs bundles the following packages.' + SEPARATOR + text + '\n');
+    fs.writeFileSync(path.join(outDir, `${name}.LICENSES.txt`), `dist/vendor/${name}.cjs bundles the following packages.` + SEPARATOR + text + '\n');
 }
 
-export async function bundleJsdom(root) {
-    const outDir = path.join(root, 'dist', 'vendor');
-    fs.mkdirSync(outDir, { recursive: true });
-    const jsdomDir = path.dirname(require.resolve('jsdom/package.json', { paths: [root] }));
-
+async function bundleOne(root, outDir, bundle) {
     const applied = new Set();
     const result = await esbuild.build({
-        stdin: { contents: "module.exports = require('jsdom');", resolveDir: root, loader: 'js', sourcefile: 'jsdom-entry.cjs' },
+        stdin: { contents: bundle.entry, resolveDir: root, loader: 'js', sourcefile: `${bundle.name}-entry.cjs` },
         absWorkingDir: root,
         bundle: true,
         platform: 'node',
         format: 'cjs',
-        target: 'node20',
-        outfile: path.join(outDir, 'jsdom.cjs'),
-        // canvas is an optional native peer that jsdom loads inside a try/catch; it is never installed
-        external: ['canvas'],
-        plugins: [jsdomPatches(jsdomDir, applied)],
+        target: 'node22',
+        outfile: path.join(outDir, `${bundle.name}.cjs`),
+        external: bundle.external || [],
+        plugins: [vendorPatches(bundle, applied)],
         // Whitespace and syntax only: identifiers keep their names, which jsdom's interface classes
         // and stack traces read. It halves the source V8 keeps for lazy compilation in every
         // thread that loads the bundle. Licenses are written beside the bundle instead
@@ -157,10 +162,16 @@ export async function bundleJsdom(root) {
     });
 
     // A patch whose file was renamed or moved never reaches its onLoad hook at all
-    const missed = PATCHES.filter(patch => !applied.has(patch));
+    const missed = (bundle.patches || []).filter(patch => !applied.has(patch));
     if (missed.length) {
-        throw new Error(`jsdom bundle: no file matched ${missed.map(patch => patch.file).join(', ')}, update the patch`);
+        throw new Error(`${bundle.name} bundle: no file matched ${missed.map(patch => patch.file).join(', ')}, update the patch`);
     }
 
-    writeLicenses(root, result.metafile, outDir);
+    writeLicenses(root, bundle.name, result.metafile, outDir);
+}
+
+export async function bundleVendor(root) {
+    const outDir = path.join(root, 'dist', 'vendor');
+    fs.mkdirSync(outDir, { recursive: true });
+    await Promise.all(BUNDLES.map(bundle => bundleOne(root, outDir, bundle)));
 }

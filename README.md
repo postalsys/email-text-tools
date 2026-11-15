@@ -2,7 +2,7 @@
 
 Email text tools
 
-Ships ES module and CommonJS builds with type declarations, Node.js 20 or newer:
+Ships ES module and CommonJS builds with type declarations, Node.js 22.22.2, 24.15.0 or newer:
 
 ```js
 import { mimeHtml, textToHtml } from '@postalsys/email-text-tools';

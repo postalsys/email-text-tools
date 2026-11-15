@@ -1,4 +1,4 @@
-// jsdom, loaded from the CommonJS bundle scripts/bundle-jsdom.js builds into dist/vendor/jsdom.cjs.
+// jsdom, loaded from the CommonJS bundle scripts/bundle-vendor.js builds into dist/vendor/jsdom.cjs.
 // jsdom pulls in ES module only packages (parse5 among them), which the CommonJS build must not
 // require(), so the package itself is a devDependency and only its bundle ships. This file compiles
 // to jsdom.cjs in dist/cjs/lib and dist/esm/lib alike, both two levels below dist/vendor.
