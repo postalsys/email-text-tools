@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/postalsys/email-text-tools/compare/v2.6.4...v3.0.0) (2026-11-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* Node.js 22.22.2, 24.15.0 or newer is required (engines.node ^22.22.2 || ^24.15.0 || >=26.0.0). On Node 20 the jsdom bundle throws when mimeHtml is first loaded.
+
+### Bug Fixes
+
+* stop retaining every rendered message, move to jsdom 31 and juice 12 ([dc6028d](https://github.com/postalsys/email-text-tools/commit/dc6028df0fa342c6504a54267a4d7ac1d7734729))
+
 ## [2.6.4](https://github.com/postalsys/email-text-tools/compare/v2.6.3...v2.6.4) (2026-11-10)
 
 
