@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/postalsys/email-text-tools/compare/v3.0.1...v3.0.2) (2026-11-16)
+
+
+### Bug Fixes
+
+* move link detection to linkify-it 6 ([8555751](https://github.com/postalsys/email-text-tools/commit/8555751eb8b1c5ee5b6b1107eeb6675bfca53b81))
+
 ## [3.0.1](https://github.com/postalsys/email-text-tools/compare/v3.0.0...v3.0.1) (2026-11-15)
 
 
