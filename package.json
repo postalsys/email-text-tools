@@ -45,6 +45,7 @@
         "dist",
         "README.md",
         "LICENSE",
+        "UNICODE-LICENSE.txt",
         "CHANGELOG.md",
         "SECURITY.md"
     ],
@@ -64,7 +65,10 @@
         "format:check": "prettier --check .",
         "prepare": "npm run build",
         "update": "rm -rf node_modules package-lock.json && ncu -u && npm install && npm run check:vendor",
-        "check:vendor": "node scripts/check-vendor-advisories.cjs"
+        "check:vendor": "node scripts/check-vendor-advisories.cjs",
+        "generate:dates": "node scripts/generate-date-data.js && npm run build && node scripts/check-date-data.js",
+        "precheck:dates": "npm run build",
+        "check:dates": "node scripts/check-date-data.js"
     },
     "repository": {
         "type": "git",

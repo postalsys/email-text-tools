@@ -185,8 +185,11 @@ describe('inline-html', () => {
     describe('date formatting', () => {
         it('should format date with locale option', () => {
             const data = { date: baseDate, html: '<p>Body</p>' };
-            const result = inlineHtml('forward', '', data, { locale: 'de' });
-            assert.ok(result.includes('<b>Date: </b>'));
+            const result = inlineHtml('forward', '', data, { locale: 'de', tz: 'UTC' });
+            // the label and the date are both German
+            assert.ok(result.includes('<b>Datum: </b>'));
+            assert.ok(result.includes('Sa., 15. Juni 2024, 14:30'));
+            assert.ok(!result.includes('<b>Date: </b>'));
         });
 
         it('should format date with timezone option', () => {

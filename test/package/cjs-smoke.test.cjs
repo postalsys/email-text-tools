@@ -26,10 +26,14 @@ describe('CommonJS build', () => {
             assert.equal(require.resolve('@postalsys/email-text-tools/' + entry), path.join(root, 'dist', 'cjs', 'index.js'));
         }
         for (const name of [
+            'date-data',
+            'date-parts',
             'format-date',
             'html-guard',
             'html-to-text',
+            'inline-header',
             'inline-html',
+            'inline-locales',
             'inline-style',
             'inline-text',
             'juice-worker',
@@ -66,6 +70,19 @@ describe('CommonJS build', () => {
         assert.equal(WorkerPool.default, WorkerPool);
 
         assert.deepEqual(Object.keys(require('@postalsys/email-text-tools/lib/inline-style')), ['INLINE_STYLE_BLOCK']);
+
+        // format-date stays a function, what it is built on lives in modules with named exports
+        const formatDate = require('@postalsys/email-text-tools/lib/format-date');
+        assert.equal(typeof formatDate, 'function');
+        assert.equal(formatDate.default, formatDate);
+        assert.deepEqual(Object.keys(require('@postalsys/email-text-tools/lib/date-parts')).sort(), ['formatDateParts', 'toValidDate']);
+        assert.deepEqual(Object.keys(require('@postalsys/email-text-tools/lib/date-data')).sort(), ['DATE_DATA', 'DATE_DATA_SOURCE']);
+        assert.deepEqual(Object.keys(require('@postalsys/email-text-tools/lib/inline-header')).sort(), ['describeHeader', 'forwardLines', 'replyLine']);
+        assert.deepEqual(Object.keys(require('@postalsys/email-text-tools/lib/inline-locales')).sort(), [
+            'INLINE_LOCALE_KEYS',
+            'fillTemplate',
+            'resolveInlineLocale'
+        ]);
 
         assert.deepEqual(Object.keys(require('@postalsys/email-text-tools/lib/html-guard')).sort(), [
             'MAX_NESTING_DEPTH',

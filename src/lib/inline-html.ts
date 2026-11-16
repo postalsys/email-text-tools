@@ -1,7 +1,8 @@
 import HTMLParser from 'node-html-parser';
 import he from 'he';
-import formatDate from './format-date.js';
 import type { FormatDateOptions } from './format-date.js';
+import { describeHeader, forwardLines, replyLine } from './inline-header.js';
+import type { HeaderRenderer } from './inline-header.js';
 import textToHtml from './text-to-html.js';
 import { MAX_NESTING_DEPTH, exceedsNestingDepth, fallbackText } from './html-guard.js';
 
@@ -23,11 +24,21 @@ export interface QuotedMessage {
     text?: string | null | undefined;
 }
 
-export type InlineAction = 'reply' | 'forward';
+export type InlineAction = 'reply' | 'reply-all' | 'forward';
+
+function escapeHtml(text: string): string {
+    return he.encode(text, { useNamedReferences: true });
+}
 
 // Escaped text in place of a body that is not worth parsing
 function fallbackBody(html: string): string {
-    return `<div style="white-space: pre-wrap;">${he.encode(fallbackText(html), { useNamedReferences: true })}</div>`;
+    return `<div style="white-space: pre-wrap;">${escapeHtml(fallbackText(html))}</div>`;
+}
+
+// An inserted name, address or date inside a right-to-left header: isolated, so its own
+// direction is worked out separately and it can not reorder the words around it
+function isolate(html: string): string {
+    return `<bdi>${html}</bdi>`;
 }
 
 function getHtmlBody(input: string | Buffer | null | undefined): string {
@@ -61,15 +72,10 @@ function formatAddressHtml(addr: MessageAddress | null | undefined): string | fa
 
     let parts: string[] = [];
     if (addr.name) {
-        parts.push(he.encode(addr.name, { useNamedReferences: true }));
+        parts.push(escapeHtml(addr.name));
     }
     if (addr.address) {
-        parts.push(
-            `${he.encode('<', { useNamedReferences: true })}<a href="mailto:${he.encode(addr.address, { useNamedReferences: true })}">${he.encode(
-                addr.address,
-                { useNamedReferences: true }
-            )}</a>${he.encode('>', { useNamedReferences: true })}`
-        );
+        parts.push(`${escapeHtml('<')}<a href="mailto:${escapeHtml(addr.address)}">${escapeHtml(addr.address)}</a>${escapeHtml('>')}`);
     }
 
     return parts.join(' ');
@@ -93,6 +99,13 @@ function formatAddressesHtml(input: QuotedMessage['from']): string | false {
     }
     return list.join(', ');
 }
+
+const HTML_RENDERER: HeaderRenderer = {
+    escape: escapeHtml,
+    isolate,
+    addresses: formatAddressesHtml,
+    subject: text => `<b>${escapeHtml(text)}</b>`
+};
 
 export default function inlineHtml(
     action: InlineAction | string,
@@ -119,67 +132,23 @@ export default function inlineHtml(
     // remove html headers and stuff
     messageContent = getHtmlBody(messageContent);
 
-    let headerLines: Array<{ title: string; content: string }> = [];
-
-    if (messageData.from) {
-        let entry = {
-            title: 'From',
-            content: formatAddressesHtml(messageData.from) || he.encode('<>', { useNamedReferences: true })
-        };
-        headerLines.push(entry);
-    }
-
-    if (messageData.subject) {
-        let entry = {
-            title: 'Subject',
-            content: `<b>${he.encode(messageData.subject, { useNamedReferences: true })}</b>`
-        };
-        headerLines.push(entry);
-    }
-
-    let dateStr = '';
-
-    if (messageData.date) {
-        dateStr = formatDate(messageData.date, options);
-
-        let entry = {
-            title: 'Date',
-            content: he.encode(dateStr, { useNamedReferences: true })
-        };
-        headerLines.push(entry);
-    }
-
-    for (let key of ['to', 'cc', 'bcc'] as const) {
-        if (messageData[key]) {
-            let content = formatAddressesHtml(messageData[key]);
-            if (content) {
-                let entry = {
-                    title: key.replace(/^./, c => c.toUpperCase()),
-                    content
-                };
-                headerLines.push(entry);
-            }
-        }
-    }
+    const header = describeHeader(action, messageData.date, options);
+    const dir = header.locale.dir === 'rtl' ? ' dir="rtl"' : '';
 
     let headers: string[] = [];
 
-    switch (action) {
+    switch (header.kind) {
         case 'forward':
-            headers.push(`<div>Begin forwarded message:</div><br class="Apple-interchange-newline">`);
+            headers.push(`<div${dir}>${escapeHtml(header.locale.strings.forward)}</div><br class="Apple-interchange-newline">`);
 
-            for (let line of headerLines) {
+            for (let line of forwardLines(header, messageData, HTML_RENDERER)) {
                 headers.push(
-                    `<div style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"><span style="font-family: -webkit-system-font, Helvetica Neue, Helvetica, sans-serif; color:rgba(0, 0, 0, 1.0);"><b>${line.title}: </b></span><span style="font-family: -webkit-system-font, Helvetica Neue, Helvetica, sans-serif;">${line.content}<br></span></div>`
+                    `<div${dir} style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"><span style="font-family: -webkit-system-font, Helvetica Neue, Helvetica, sans-serif; color:rgba(0, 0, 0, 1.0);"><b>${line.label}</b></span><span style="font-family: -webkit-system-font, Helvetica Neue, Helvetica, sans-serif;">${line.value}<br></span></div>`
                 );
             }
             break;
         case 'reply':
-            headers.push(
-                `<div>On ${he.encode(dateStr, { useNamedReferences: true })}, ${
-                    formatAddressesHtml(messageData.from) || he.encode('<>', { useNamedReferences: true })
-                } wrote:</div>`
-            );
+            headers.push(`<div${dir}>${replyLine(header, messageData.from, HTML_RENDERER)}</div>`);
             break;
     }
 

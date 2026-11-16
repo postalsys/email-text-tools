@@ -182,8 +182,10 @@ describe('inline-text', () => {
     describe('date formatting', () => {
         it('should format date with locale', () => {
             const data = { date: baseDate, text: 'Body' };
-            const result = inlineText('forward', '', data, { locale: 'de' });
-            assert.ok(result.includes('> Date:'));
+            const result = inlineText('forward', '', data, { locale: 'de', tz: 'UTC' });
+            // the label and the date are both German
+            assert.ok(result.includes('> Datum: Sa., 15. Juni 2024, 14:30'));
+            assert.ok(!result.includes('> Date:'));
         });
 
         it('should format date with timezone', () => {

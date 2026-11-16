@@ -390,8 +390,6 @@ describe('hostile input hardening', () => {
 
     describe('reply/forward date header', () => {
         const date = new Date('2024-06-15T14:30:00Z');
-        const hasLocale = locale => Intl.DateTimeFormat.supportedLocalesOf([locale]).length > 0;
-
         it('formats in English by default', () => {
             assert.equal(formatDate(date, { tz: 'UTC' }), 'Sat, Jun 15, 2024, 2:30 PM');
         });
@@ -401,11 +399,9 @@ describe('hostile input hardening', () => {
             assert.equal(formatDate(date, { tz: 'Asia/Tokyo' }), 'Sat, Jun 15, 2024, 11:30 PM');
         });
 
-        it('honors the locale', t => {
-            if (!hasLocale('de') || !hasLocale('et') || !hasLocale('ja')) {
-                t.skip('Node built without full ICU data');
-                return;
-            }
+        // the patterns come from the library's own table, so this holds on a Node.js build
+        // without ICU data for these languages too
+        it('honors the locale', () => {
             assert.equal(formatDate(date, { locale: 'de', tz: 'Europe/Berlin' }), 'Sa., 15. Juni 2024, 16:30');
             assert.equal(formatDate(date, { locale: 'et', tz: 'Europe/Tallinn' }), 'L, 15. juuni 2024, 17:30');
             assert.ok(formatDate(date, { locale: 'ja', tz: 'Asia/Tokyo' }).includes('2024'));

@@ -1,7 +1,19 @@
-import formatDate from './format-date.js';
 import type { FormatDateOptions } from './format-date.js';
 import htmlToText from './html-to-text.js';
+import { describeHeader, forwardLines, replyLine } from './inline-header.js';
+import type { HeaderRenderer } from './inline-header.js';
 import type { InlineAction, MessageAddress, QuotedMessage } from './inline-html.js';
+
+// In a right-to-left header an inserted name, address or date is wrapped in FIRST STRONG ISOLATE
+// and POP DIRECTIONAL ISOLATE: without them the angle brackets of an address reorder around it,
+// and a line that starts with a Latin name would be laid out left to right as a whole
+function isolate(text: string): string {
+    return '\u2068' + text + '\u2069';
+}
+
+function asIs(text: string): string {
+    return text;
+}
 
 function formatAddressText(addr: MessageAddress | null | undefined): string | false {
     if (!addr || (!addr.name && !addr.address)) {
@@ -38,6 +50,9 @@ function formatAddressesText(input: QuotedMessage['from']): string | false {
     return list.join(', ');
 }
 
+// Plain text needs no escaping, only the isolates of a right-to-left header
+const TEXT_RENDERER: HeaderRenderer = { escape: asIs, isolate, addresses: formatAddressesText, subject: asIs };
+
 function escapeText(text: string): string {
     return '> ' + text.replace(/\r?\n/g, '\n> ');
 }
@@ -64,61 +79,20 @@ export default function inlineText(
         return messageContent;
     }
 
-    let headerLines: Array<{ title: string; content: string }> = [];
-
-    if (messageData.from) {
-        let entry = {
-            title: 'From',
-            content: formatAddressesText(messageData.from) || '<>'
-        };
-        headerLines.push(entry);
-    }
-
-    if (messageData.subject) {
-        let entry = {
-            title: 'Subject',
-            content: messageData.subject
-        };
-        headerLines.push(entry);
-    }
-
-    let dateStr = '';
-
-    if (messageData.date) {
-        dateStr = formatDate(messageData.date, options);
-
-        let entry = {
-            title: 'Date',
-            content: dateStr
-        };
-        headerLines.push(entry);
-    }
-
-    for (let key of ['to', 'cc', 'bcc'] as const) {
-        if (messageData[key]) {
-            let content = formatAddressesText(messageData[key]);
-            if (content) {
-                let entry = {
-                    title: key.replace(/^./, c => c.toUpperCase()),
-                    content
-                };
-                headerLines.push(entry);
-            }
-        }
-    }
+    const header = describeHeader(type, messageData.date, options);
 
     let headers: string[] = [];
 
-    switch (type) {
+    switch (header.kind) {
         case 'forward':
-            headers.push('Begin forwarded message:\n');
+            headers.push(header.locale.strings.forward + '\n');
 
-            for (let line of headerLines) {
-                headers.push(`${line.title}: ${line.content}`);
+            for (let line of forwardLines(header, messageData, TEXT_RENDERER)) {
+                headers.push(line.label + line.value);
             }
             break;
         case 'reply':
-            headers.push(`On ${dateStr}, ${formatAddressesText(messageData.from) || '<>'} wrote:\n`);
+            headers.push(replyLine(header, messageData.from, TEXT_RENDERER) + '\n');
             break;
     }
 

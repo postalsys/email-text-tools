@@ -1,5 +1,7 @@
 # Auto-generated files
 CHANGELOG.md
+# written by scripts/generate-date-data.js, one entry per line
+src/lib/date-data.ts
 
 # Dependencies
 node_modules/

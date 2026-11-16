@@ -19,10 +19,14 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const tsc = require.resolve('typescript/bin/tsc');
 
 const LIB_MODULES = [
+    'date-data',
+    'date-parts',
     'format-date',
     'html-guard',
     'html-to-text',
+    'inline-header',
     'inline-html',
+    'inline-locales',
     'inline-style',
     'inline-text',
     'juice-worker',
@@ -72,6 +76,34 @@ describe('ES module build', () => {
         assert.equal(INLINE_STYLE_BLOCK, cjs.INLINE_STYLE_BLOCK);
     });
 
+    it('writes the same translated headers as the CommonJS build', async () => {
+        const cjs = require('@postalsys/email-text-tools');
+        const { INLINE_LOCALE_KEYS, resolveInlineLocale } = await import('@postalsys/email-text-tools/lib/inline-locales');
+        const formatDate = (await import('@postalsys/email-text-tools/lib/format-date')).default;
+        const cjsLocales = require('@postalsys/email-text-tools/lib/inline-locales');
+        assert.deepEqual(INLINE_LOCALE_KEYS, cjsLocales.INLINE_LOCALE_KEYS);
+        assert.equal(INLINE_LOCALE_KEYS.length, 55);
+
+        const message = {
+            from: { name: 'Jane Doe', address: 'jane@example.com' },
+            to: { address: 'ann@example.com' },
+            subject: 'Subject',
+            date: new Date('2026-11-16T09:45:00Z'),
+            text: 'Original',
+            html: '<p>Original</p>'
+        };
+        for (const locale of INLINE_LOCALE_KEYS) {
+            const options = { locale, tz: 'UTC' };
+            assert.deepEqual(resolveInlineLocale(locale), cjsLocales.resolveInlineLocale(locale));
+            assert.equal(formatDate(message.date, options), require('@postalsys/email-text-tools/lib/format-date')(message.date, options));
+            for (const action of ['reply', 'reply-all', 'forward']) {
+                assert.equal(inlineText(action, 'New', message, options), cjs.inlineText(action, 'New', message, options), `${locale} ${action}`);
+                assert.equal(inlineHtml(action, '<p>New</p>', message, options), cjs.inlineHtml(action, '<p>New</p>', message, options), `${locale} ${action}`);
+            }
+        }
+        assert.match(inlineText('reply', 'New', message, { locale: 'sv', tz: 'UTC' }), /> Den mån 16 nov\. 2026 kl\. 9:45 skrev Jane Doe <jane@example\.com>:/);
+    });
+
     it('runs juice in the ES module worker of the pool', async () => {
         const html = await mimeHtml.async({ html: '<style>p { color: red; }</style><p>x</p>' }, { fallbackOnError: false });
         assert.match(html, /<p style="color: red;">x<\/p>/);
@@ -115,6 +147,10 @@ describe('Packed package', () => {
         for (const name of ['jsdom', 'juice'].flatMap(bundle => [`${bundle}.cjs`, `${bundle}.LICENSES.txt`, `${bundle}.packages.json`])) {
             assert.ok(files.includes(`dist/vendor/${name}`), `dist/vendor/${name} is packed`);
         }
+        // the date table is derived from Unicode CLDR data, whose license asks for its notice
+        // to travel with the data
+        assert.ok(files.includes('UNICODE-LICENSE.txt'), 'UNICODE-LICENSE.txt is packed');
+        assert.ok(files.includes('LICENSE'), 'LICENSE is packed');
         for (const file of files) {
             assert.ok(!/^(src|test|scripts|benchmark|examples|docs)\//.test(file), `${file} must not be packed`);
         }
