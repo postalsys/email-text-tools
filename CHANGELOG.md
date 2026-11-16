@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/postalsys/email-text-tools/compare/v3.0.2...v3.1.0) (2026-11-16)
+
+
+### Features
+
+* write reply and forward headers in the language of the locale ([e6d82e8](https://github.com/postalsys/email-text-tools/commit/e6d82e8d1ce5144ea98b272e12e5376a8d90a3c7))
+
 ## [3.0.2](https://github.com/postalsys/email-text-tools/compare/v3.0.1...v3.0.2) (2026-11-16)
 
 
