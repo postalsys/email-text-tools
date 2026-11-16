@@ -63,7 +63,8 @@
         "format": "prettier --write .",
         "format:check": "prettier --check .",
         "prepare": "npm run build",
-        "update": "rm -rf node_modules package-lock.json && ncu -u && npm install"
+        "update": "rm -rf node_modules package-lock.json && ncu -u && npm install && npm run check:vendor",
+        "check:vendor": "node scripts/check-vendor-advisories.cjs"
     },
     "repository": {
         "type": "git",

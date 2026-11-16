@@ -32,3 +32,6 @@ jobs:
             - run: npm test
             - name: CommonJS dependency graph (require(esm) disabled)
               run: npm run test:cjs
+            # the packages compiled into dist/vendor are invisible to npm audit
+            - name: Advisories for bundled packages
+              run: npm run check:vendor
