@@ -1,12 +1,33 @@
-import LinkifyIt from 'linkify-it';
+import { LinkifyIt, REBuilder } from 'linkify-it';
 import he from 'he';
 import { TLDS } from './commonjs.cjs';
 
-const linkify = new LinkifyIt()
+// Characters linkify-it 6 accepts in the local part of a schemaless address, less the slash, and
+// less the apostrophe as the first character. With them a path such as
+// usr/lib/addons/langpack-de@firefox.example.com/install.rdf, or a quoted
+// 'user@example.com', became a mailto: link that started with the slash path or the
+// quote. linkify-it 5 never linked either, and an apostrophe inside a name (o'brien@...) still works.
+// mailparser carries the same rule.
+const MAIL_NAME_CHARS = '-!#$%&*+=?^_`{|}~a-zA-Z0-9';
+const MAIL_NAME = new RegExp(`[${MAIL_NAME_CHARS}](?:[${MAIL_NAME_CHARS}']|[.](?=[${MAIL_NAME_CHARS}'])){0,63}`);
+
+class MailNameREBuilder extends REBuilder {
+    override get_mail_name(): RegExp {
+        return MAIL_NAME;
+    }
+}
+
+const linkify = new LinkifyIt({
+    // links without a scheme (example.com, www.example.org), which linkify-it 6 no longer finds by default
+    fuzzyLink: true,
+    fuzzyIP: true,
+    // user:password@ in a URL stays part of the link, as it always was before linkify-it 6
+    urlAuth: true,
+    rebuilder: new MailNameREBuilder()
+})
     .tlds(TLDS) // Reload with full tlds list
     .tlds('onion', true) // Add unofficial `.onion` domain
-    .add('git:', 'http:') // Add `git:` protocol as "alias"
-    .set({ fuzzyIP: true });
+    .add('git:', { validate: (text, pos, self) => self.testSchemaAt(text, 'http:', pos) }); // `git:` links validate like `http:` ones
 
 // Quote levels deeper than this are kept as literal "> " text. Every level costs a few stack
 // frames here and a nested <blockquote> later, so hostile input with thousands of leading ">"

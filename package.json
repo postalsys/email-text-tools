@@ -84,7 +84,6 @@
         "@types/he": "1.2.3",
         "@types/html-to-text": "9.0.4",
         "@types/jsdom": "30.0.0",
-        "@types/linkify-it": "5.0.0",
         "@types/node": "22.20.5",
         "esbuild": "0.28.2",
         "eslint": "10.15.0",
@@ -101,7 +100,7 @@
         "dompurify": "3.4.18",
         "he": "1.2.0",
         "html-to-text": "10.0.1",
-        "linkify-it": "5.0.2",
+        "linkify-it": "6.1.0",
         "node-html-parser": "9.0.7",
         "tlds": "1.261.0"
     },

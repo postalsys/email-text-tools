@@ -10,17 +10,12 @@ module.exports = {
         // never require()s the package, so the ESM copy is installed but never loaded. Unpinned 2026-08,
         // which also drops a duplicate parser from EmailEngine's tree (@postalsys/email-content already
         // pulls 9.x). Keep it unpinned unless a release starts require()ing entities for real.
-        // 6.0.0 changed the CommonJS export shape (named bindings instead of the constructor) and,
-        // more importantly, stopped linkifying bare domains such as 'example.com' or 'www.example.org'
-        // by default, which silently breaks autolinking in plain text emails. Stay on 5.x.
-        'linkify-it',
         // 2.0.0 is ESM-only (exports only src/he.mjs), so pkg cannot bundle it. 1.2.0 is the last
         // CommonJS release; EmailEngine and mailparser hold it there too, and a different copy here
         // would be a second he in their trees
         'he',
         // Type declarations follow the runtime package they describe, which is held above
-        '@types/he',
-        '@types/linkify-it'
+        '@types/he'
     ],
     target: name => {
         // @types/node stays on the 22.x line so the compiler rejects APIs that do
