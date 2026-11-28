@@ -46,7 +46,13 @@ const htmlToTextCompiled = compile({
     limits: { maxDepth: 500, ellipsis: '' }
 });
 
+// The converter's selector picker looks a tag name up in a plain object, so an element named after a
+// member of every object ("constructor", "valueOf") finds that member there and the conversion
+// throws. A sender can put one in any message, so such a tag is renamed to a span first, which the
+// converter reads as the inline element an unknown one is anyway
+const OBJECT_MEMBER_TAG = new RegExp(`<(/?)(?:${Object.getOwnPropertyNames(Object.prototype).join('|')})(?=[\\s/>]|$)`, 'gi');
+
 // Wrapper function that applies post-processing
 export default function htmlToText(html: string): string {
-    return cleanupNewlines(htmlToTextCompiled(html));
+    return cleanupNewlines(htmlToTextCompiled(String(html ?? '').replace(OBJECT_MEMBER_TAG, '<$1span')));
 }

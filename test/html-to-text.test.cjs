@@ -5,6 +5,20 @@ const assert = require('node:assert/strict');
 const htmlToText = require('@postalsys/email-text-tools/lib/html-to-text');
 
 describe('html-to-text conversion', () => {
+    it('converts an element named after a member of every object', () => {
+        for (const name of Object.getOwnPropertyNames(Object.prototype)) {
+            for (const html of [
+                `<p>before</p><${name}>inside</${name}><p>after</p>`,
+                `<table><tr><td><${name.toUpperCase()} a="1">inside</${name}></td></tr></table>`
+            ]) {
+                const text = htmlToText(html);
+                assert.ok(text.includes('inside'), html);
+            }
+        }
+        // a name that only starts like one is left as it is
+        assert.ok(htmlToText('<constructors>kept</constructors>').includes('kept'));
+    });
+
     it('should preserve newlines from br tags', () => {
         const html = 'Line 1<br>Line 2<br>Line 3';
         const text = htmlToText(html);
