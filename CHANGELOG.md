@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.3](https://github.com/postalsys/email-text-tools/compare/v3.1.2...v3.1.3) (2026-11-28)
+
+
+### Bug Fixes
+
+* convert a message holding an element named "constructor" ([8e84101](https://github.com/postalsys/email-text-tools/commit/8e84101d98942e09830047b0eb6058d6d97da7c5))
+* convert a message holding an element named "constructor" ([2620624](https://github.com/postalsys/email-text-tools/commit/26206242267abb49f823bc0080be2c6f616cec9c))
+
 ## [3.1.2](https://github.com/postalsys/email-text-tools/compare/v3.1.1...v3.1.2) (2026-11-26)
 
 
